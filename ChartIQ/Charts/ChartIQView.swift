@@ -152,7 +152,8 @@ public class ChartIQView: UIView {
     
     internal var webView: WKWebView!
     
-    static internal var url = ""
+    static internal var url = "http://192.168.1.31:8080/3.0.0/default/template-basic.html"
+    static internal var refreshInterval = "0"
     
     public static var chartIQUrl: String {
         return ChartIQView.url
@@ -172,50 +173,13 @@ public class ChartIQView: UIView {
     
     internal var _dataMethod: ChartIQDataMethod = .push
     
-    internal var nativeJSBridgeScript: WKUserScript {
-        let source =
-            "function callNativeFunctionToGetCode (parameters, cb) { " +
-                "if (parameters[\"func\"] == \"pullInitialData\") { " +
-                "   quoteFeedCallbacks[\"Initial\"] = cb ;" +
-                "   webkit.messageHandlers.pullInitialDataHandler.postMessage({\"symbol\": parameters[\"symbol\"], \"startDate\": parameters[\"start\"].toISOString()," +
-                "\"endDate\": parameters[\"end\"].toISOString(), \"interval\": parameters[\"timeUnit\"], \"period\": parameters[\"period\"]}); " +
-                "} " +
-                "if (parameters[\"func\"] == \"pullUpdate\") { " +
-                "   var cbId = \"U\" + symbol + \" S \" + parameters[\"start\"].toISOString(); " +
-                "   quoteFeedCallbacks[cbId] = cb ;" +
-                "   webkit.messageHandlers.pullUpdateDataHandler.postMessage({\"cb\": cbId, \"symbol\": parameters[\"symbol\"], \"startDate\": parameters[\"start\"].toISOString(), " +
-                "\"interval\": parameters[\"timeUnit\"], \"period\": parameters[\"period\"]}); " +
-                "} " +
-                "if (parameters[\"func\"] == \"pullPagination\") { " +
-                "   var cbId = \"U\" + symbol + \" S \" + parameters[\"start\"].toISOString() + \" E \" + parameters[\"end\"].toISOString();" +
-                "   quoteFeedCallbacks[cbId] = cb ;" +
-                "   webkit.messageHandlers.pullPaginationDataHandler.postMessage({\"cb\": cbId, \"symbol\": parameters[\"symbol\"], \"startDate\": parameters[\"start\"].toISOString(), " +
-                "\"endDate\": parameters[\"end\"].toISOString(), \"interval\": parameters[\"timeUnit\"], \"period\": parameters[\"period\"]}); " +
-                "} " +
-            "} "
-        
-        return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-    }
-    
     internal var drawingScript: WKUserScript {
-        let source =
-            "stxx.addEventListener(\"drawing\", function(drawingObject){ " +
-            "   var s = drawingObject.drawings;" +
-            "   var drawings = []; " +
-            "   for(var n in s) { " +
-            "       var drawing=s[n]; " +
-            "       drawings.push(drawing.serialize()); " +
-            "   } " +
-            "webkit.messageHandlers.drawingHandler.postMessage(JSON.stringify(drawings)); " +
-            "});"
+        let source = "addDrawingListener();";
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
     internal var layoutScript: WKUserScript {
-        let source =
-            "stxx.addEventListener(\"layout\", function(layoutObject){ " +
-            "   webkit.messageHandlers.layoutHandler.postMessage(JSON.stringify(layoutObject.layout)); " +
-            "});"
+        let source = "addLayoutListener();"
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
@@ -565,8 +529,6 @@ public class ChartIQView: UIView {
         let userContentController = WKUserContentController()
         userContentController.addUserScript(layoutScript)
         userContentController.addUserScript(drawingScript)
-        userContentController.addUserScript(nativeJSBridgeScript)
-        
         
         userContentController.add(self, name: ChartIQCallbackMessage.newSymbol.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.pullInitialData.rawValue)
@@ -615,12 +577,10 @@ public class ChartIQView: UIView {
         _dataMethod = method
         addEvent("CHIQ_setDataMethod", parameters: ["method": method == .pull ? "PULL" : "PUSH"])
         if method == .pull {
-            let script = "stxx.attachEngineQuoteFeed(quoteFeedNativeBridge,{refreshInterval: 1}); "
+            let script = "attachQuoteFeed(" + ChartIQView.refreshInterval + ")";
             webView.evaluateJavaScript(script, completionHandler: nil)
         } else {
-            let script =
-                "stxx.newChart(stxx.chart.symbol, [], null, null); " +
-                "stxx.setResizeTimer(1000); "                
+            let script = "callNewChart(); "
             webView.evaluateJavaScript(script, completionHandler: nil)
         }
     }
@@ -629,27 +589,25 @@ public class ChartIQView: UIView {
     ///
     /// - Parameter type: The chart type
     public func setChartType(_ type: ChartIQChartType) {
-        var typeName = ""
+        var chartType = ""
         switch type {
-        case .line: typeName = "line"
-        case .candle: typeName = "candle"
-        case .bar: typeName = "bar"
-        case .wave: typeName = "wave"
-        case .colored_bar: typeName = "colored_bar"
-        case .colored_line: typeName = "colored_line"
-        case .hollow_candle: typeName = "hollow_candle"
-        case .volume_candle: typeName = "volume_candle"
-        case .scatterplot: typeName = "scatterplot"
-        case .baseline_delta: typeName = "baseline_delta"
-        case .baseline_delta_mountain: typeName = "baseline_delta_mountain"
-        case .mountain: typeName = "mountain"
-        case .colored_mountain: typeName  = "colored_mountain"
+        case .line: chartType = "line"
+        case .candle: chartType = "candle"
+        case .bar: chartType = "bar"
+        case .wave: chartType = "wave"
+        case .colored_bar: chartType = "colored_bar"
+        case .colored_line: chartType = "colored_line"
+        case .hollow_candle: chartType = "hollow_candle"
+        case .volume_candle: chartType = "volume_candle"
+        case .scatterplot: chartType = "scatterplot"
+        case .baseline_delta: chartType = "baseline_delta"
+        case .baseline_delta_mountain: chartType = "baseline_delta_mountain"
+        case .mountain: chartType = "mountain"
+        case .colored_mountain: chartType  = "colored_mountain"
         }
-        let script =
-            "stxx.layout.aggregationType = \"\"; " +
-            "stxx.setChartType(\"\(typeName)\");"
+        let script = "setChartType(\"\(chartType)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
-        addEvent("CHIQ_setChartType", parameters: ["chartType": typeName])
+        addEvent("CHIQ_setChartType", parameters: ["chartType": chartType])
         addEvent("CHIQ_setAggregationType", parameters: ["aggregationType": ""])
     }
     
@@ -657,21 +615,19 @@ public class ChartIQView: UIView {
     ///
     /// - Parameter type: The aggregation type
     public func setAggregationType(_ type: ChartIQAggregationType) {
-        var typeName = ""
+        var aggregationType = ""
         switch type {
-        case .rangebars: typeName = "rangebars"
-        case .ohlc: typeName = "ohlc"
-        case .kagi: typeName = "kagi"
-        case .pandf: typeName = "pandf"
-        case .heikinashi: typeName = "heikinashi"
-        case .linebreak: typeName = "linebreak"
-        case .renko: typeName = "renko"
+        case .rangebars: aggregationType = "rangebars"
+        case .ohlc: aggregationType = "ohlc"
+        case .kagi: aggregationType = "kagi"
+        case .pandf: aggregationType = "pandf"
+        case .heikinashi: aggregationType = "heikinashi"
+        case .linebreak: aggregationType = "linebreak"
+        case .renko: aggregationType = "renko"
         }
-        let script =
-            "stxx.layout.aggregationType = \"\(typeName)\"; " +
-            "stxx.setChartType(\"candle\"); "
+        let script = "setAggregationType(\"\(chartType)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
-        addEvent("CHIQ_setAggregationType", parameters: ["aggregationType": typeName])
+        addEvent("CHIQ_setAggregationType", parameters: ["aggregationType": aggregationType])
         addEvent("CHIQ_setChartType", parameters: ["chartType": "candle"])
     }
     
@@ -686,13 +642,7 @@ public class ChartIQView: UIView {
         if Int(interval) == nil {
             _interval = "\"" + interval + "\""
         }
-        if dataMethod == .push {
-            webView.evaluateJavaScript("stxx.newChart(stxx.chart.symbol, [], null, null, {periodicity:{period:\(period),interval:\(_interval)}}); " +
-                "stxx.setResizeTimer(1000);"
-                , completionHandler: nil)
-        } else {
-            webView.evaluateJavaScript("stxx.setPeriodicityV2(\(period), \(_interval), \"\(timeUnit)\");", completionHandler: nil)
-        }
+        webView.evaluateJavaScript("setPeriodicity(\(period), \(_interval), \"\(timeUnit)\");", completionHandler: nil)
         addEvent("CHIQ_setPeriodicity", parameters: ["period": String(period), "interval": interval])
     }
     
@@ -701,9 +651,7 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - symbol: The symbol for the new chart - a symbol string
     public func setSymbol(_ symbol: String) {
-        let script =
-            "stxx.newChart(\"\(symbol)\", \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\"\(symbol)\"); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); " +
-            "stxx.setResizeTimer(1000);"
+        let script = "callNewChart(\"\(symbol)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setSymbol", parameters: ["symbol": symbol])
     }
@@ -714,8 +662,7 @@ public class ChartIQView: UIView {
     ///   - object: The symbol object for the new chart
     public func setSymbolObject(_ object: Symbol) {
         let script =
-            "stxx.newChart(\"\(symbol)\", \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\"\(symbol)\"); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); " +
-            "stxx.setResizeTimer(1000);"
+            "stxx.newChart(\"\(symbol)\", \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\"\(symbol)\"); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setSymbolObject", parameters: ["symbolObject.symbol": object.symbol])
     }
@@ -726,14 +673,9 @@ public class ChartIQView: UIView {
     ///   - symbol: The symbol for the new chart - a symbol string
     ///   - color: Color to draw line
     public func addComparisonSymbol(_ symbol: String, color: UIColor = UIColor.red) {
-        let addSeriesScript = "stxx.addSeries(\"\(symbol)\", {display:\"\(symbol)\", isComparison:true});"
-        let setSeriesRendererScript =
-            "var mdataRenderer=stxx.setSeriesRenderer(new CIQ.Renderer.Lines({params:{name:\"My Line Series\", type:\"line\", gaps:{pattern:[3,3]}, width:1}}))" +
-            ".attachSeries(\"\(symbol)\",{color:\"\(color.toHexString())\",permanent:true})" +
-            ".ready();"
+        let addSeriesScript = "stxx.addSeries(\"\(symbol)\", {display:\"\(symbol)\", color: \"\(color.toHexString())\"  isComparison:true});"
 
         webView.evaluateJavaScript(addSeriesScript, completionHandler: nil)
-        webView.evaluateJavaScript(setSeriesRendererScript, completionHandler: nil)
         addEvent("CHIQ_addComparison", parameters: ["symbol": symbol])
     }
     
@@ -774,15 +716,14 @@ public class ChartIQView: UIView {
     
     /// Turns crosshairs on
     public func enableCrosshairs() {
-        let script = "stxx.layout.crosshair = true; "
+        let script = "enableCrosshairs(true);"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_enableCrosshairs")
     }
     
     /// Turns crosshairs off
     public func disableCrosshairs() {
-        let script = "stxx.layout.crosshair = false; " +
-            "stxx.changeVectorType(null); "
+        let script = "enableCrosshairs(false);"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_disableCrosshairs")
     }
@@ -797,20 +738,7 @@ public class ChartIQView: UIView {
     
     /// Gets crosshair highlighted price data for HUD 
     public func getCrosshairsHUDDetail() -> CrosshairHUD? {
-        let script =
-            "var data = {}; " +
-            "var tick=stxx.barFromPixel(stxx.cx); " +
-            "var prices=stxx.chart.xaxis[tick]; " +
-            "if(prices!=null){ " +
-            "   if(prices.data){ " +
-            "       data[\"open\"] = stxx.formatPrice(prices.data.Open); " +
-            "       data[\"close\"] = stxx.formatPrice(prices.data.Close); " +
-            "       data[\"high\"] = stxx.formatPrice(prices.data.High); " +
-            "       data[\"low\"] = stxx.formatPrice(prices.data.Low); " +
-            "       data[\"volume\"] = CIQ.condenseInt(prices.data.Volume); " +
-            "   } " +
-            "} " +
-            "JSON.stringify(data);"
+        let script = "getHudDetails();"
         let result = webView.evaluateJavaScriptWithReturn(script)
         if let result = result, let data = result.data(using: .utf8) {
             let json = try! JSONSerialization.jsonObject(with: data, options: [])
@@ -840,8 +768,7 @@ public class ChartIQView: UIView {
         let jsonData = try! JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)
         let script =
-            "stxx.newChart(stxx.chart.symbol, \(jsonString!)); " +
-            "stxx.setResizeTimer(1000);"
+            "callNewChart(\"\", \(jsonString!)); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_pushInitialData", parameters: ["symbol": symbol, "data": jsonString!])
     }
@@ -853,20 +780,7 @@ public class ChartIQView: UIView {
         let obj = data.map{ $0.toDictionary() }
         let jsonData = try! JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
-        let script =
-            "var feeddata=JSON.parse('\(jsonString)'); " +
-            "var newQuotes=[]; " +
-            "for(var i=0;i<feeddata.length;i++){ " +
-            "   newQuotes[i]={}; " +
-            "   newQuotes[i].DT=new Date(feeddata[i].DT); " +
-            "   newQuotes[i].Open=feeddata[i].Open; " +
-            "   newQuotes[i].High=feeddata[i].High; " +
-            "   newQuotes[i].Low=feeddata[i].Low; " +
-            "   newQuotes[i].Close=feeddata[i].Close; " +
-            "   newQuotes[i].Volume=feeddata[i].Volume; " +
-            "} " +
-            "stxx.appendMasterData(newQuotes); " +
-            "stxx.setResizeTimer(1000);"
+        let script = "parseData('\(jsonString)');"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_pushUpdate", parameters: ["symbol": symbol, "data": jsonString])
     }
@@ -910,10 +824,7 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nil if an error occur
     public func getStudyInputParameters(by name: String) -> Any?  {
         addEvent("CHIQ_getStudyInputParameters", parameters: ["studyName": name])
-        let script =
-            getStudyDescriptorScript(with: name) +
-            "var helper = new CIQ.Studies.DialogHelper({sd:selectedSd,stx:stxx}); " +
-            "JSON.stringify(helper.inputs);"
+        let script = "getStudyParameters(\"" + name + "\" , true);"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             let json = try? JSONSerialization.jsonObject(with: data, options: [])
             if let inputs = json as? [[String: Any]] {
@@ -933,10 +844,7 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nil if an error occur
     public func getStudyOutputParameters(by name: String) -> Any?  {
         addEvent("CHIQ_getStudyOutputParameters", parameters: ["studyName": name])
-        let script =
-            getStudyDescriptorScript(with: name) +
-            "var helper = new CIQ.Studies.DialogHelper({sd:selectedSd,stx:stxx}); " +
-            "JSON.stringify(helper.outputs);"
+        let script = "getStudyParameters(\"" + name + "\" , false);"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: [])
@@ -996,8 +904,8 @@ public class ChartIQView: UIView {
     ///   - outputs: Outputs for the study instance. If nil, it will use the paramters defined in CIQ.Studies.DialogHelper.
     /// - Throws: ChartIQStudyError
     public func addStudy(_ name: String, with inputs: [String: Any]? = nil, outputs: [String: Any]? = nil) throws {
-        var _inputs: String?
-        var _outputs: String?
+        var _inputs = String("null")
+        var _outputs = String("null")
         if let inputs = inputs {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted)
@@ -1019,17 +927,7 @@ public class ChartIQView: UIView {
             throw ChartIQStudyError.studyNotFound
         }
         
-        var script = ""
-        if inputs == nil && outputs == nil {
-            script = "CIQ.Studies.addStudy(stxx, '\(name)'); "
-        } else {
-            let helperScript = "var helper = new CIQ.Studies.DialogHelper({name:\"\(name)\",stx:stxx}); "
-            let inputScript = _inputs != nil ? "var inputs = \(_inputs!);" : "var inputs = null; "
-            let outputScript = _outputs != nil ? "var outputs = \(_outputs!);" : "var outputs = null; "
-            let addStudyScript = "CIQ.Studies.addStudy(stxx, \"\(name)\", inputs, outputs); "
-            script = helperScript + inputScript + outputScript + addStudyScript
-        }
-    
+        let script = "addStudy('\(name)', \(_inputs!), \(_outputs!));"
         webView.evaluateJavaScript(script, completionHandler: nil)        
         addEvent("CHIQ_addStudy", parameters: ["studyName": name])
     }
@@ -1038,37 +936,15 @@ public class ChartIQView: UIView {
     ///
     /// - Parameter name: The study name
     public func removeStudy(_ name: String) {
-        let script = "var s=stxx.layout.studies; " +
-            "for(var n in s) { " +
-            "   var sd=s[n]; " +
-            "   if (sd.name === \"\(name)\") { " +
-            "       CIQ.Studies.removeStudy(stxx,sd); " +
-            "   } " +
-            "} "
+        let script = "removeStudy('\(name)');"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_removeStudy")
     }
     
-    /// Remove all study from the Chart.
+    /// Remove all studies from the Chart.
     public func removeAllStudies() {
-        let getStudyCountscript =
-            "var s=stxx.layout.studies; " +
-            "var count = 0;" +
-            "for(var n in s) { count++ }" +
-            "count.toString()"
-        
-        if let countString = webView.evaluateJavaScriptWithReturn(getStudyCountscript), let count = Int(countString) {
-            if count > 0 {
-                let script =
-                    "var s=stxx.layout.studies; " +
-                    "for(var n in s) { " +
-                    "   var sd=s[n]; " +
-                    "   CIQ.Studies.removeStudy(stxx,sd); " +
-                    "} "
-                webView.evaluateJavaScript(script, completionHandler: nil)
-                removeAllStudies()
-            }
-        }
+        let script = "removeAllStudies();"
+        webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
     /// Lists studies added on the Chart.
@@ -1076,16 +952,27 @@ public class ChartIQView: UIView {
     /// - Returns: The array of Study name
     public func getAddedStudyList() -> [Study] {
         var addedStudy = [Study]()
-        let script =
-            "var list = []; " +
-            "var s=stxx.layout.studies; " +
-            "for(var n in s) { " +
-            "   var sd=s[n]; " +
-            "   list.push(sd.name + \"___\" + JSON.stringify(sd.inputs) + \"___\" + JSON.stringify(sd.outputs)); " +
-            "} " +
-            "list.join(\"|||\");"
-        if let listString = webView.evaluateJavaScriptWithReturn(script), !listString.isEmpty {
+        //let script =
+          //  "var list = []; " +
+            //"var s=stxx.layout.studies; " +
+            //"for(var n in s) { " +
+            //"   var sd=s[n]; " +
+            //"   list.push(sd.name + \"___\" + JSON.stringify(sd.inputs) + \"___\" + JSON.stringify(sd.outputs)); " +
+            //"} " +
+            //"list.join(\"|||\");"
+        
+        let script = "getActiveStudies();"
+        if let listString = webView.evaluateJavaScriptWithReturn(script), let data = listString.data(using: .utf8) {
             let list = listString.components(separatedBy: "|||")
+            //let json = try JSONSerialization.jsonObject(with: data, options: [])
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
+                print(json)
+            } catch {
+                print("ERRROR(((((((((((((((((((((((((((((((((((((((((((((")
+            }
+
             list.forEach({ (study) in
                 let components = study.components(separatedBy: "___")
                 let name = components[0]
@@ -1272,20 +1159,7 @@ public class ChartIQView: UIView {
     fileprivate func formatJSQuoteData(from data: [ChartIQData], cb: String) {
         let data = try! JSONSerialization.data(withJSONObject: data.map{ $0.toDictionary()}, options: .prettyPrinted)
         let json = String(data: data, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
-        let script =
-            "var feeddata=JSON.parse('\(json)'); " +
-            "var newQuotes=[]; " +
-            "for(var i=0;i<feeddata.length;i++){ " +
-            "   newQuotes[i]={}; " +
-            "   newQuotes[i].DT=new Date(feeddata[i].DT); " +
-            "   newQuotes[i].Open=feeddata[i].Open; " +
-            "   newQuotes[i].High=feeddata[i].High; " +
-            "   newQuotes[i].Low=feeddata[i].Low; " +
-            "   newQuotes[i].Close=feeddata[i].Close; " +
-            "   newQuotes[i].Volume=feeddata[i].Volume; " +
-            "} " +
-            "var quoteFeedCb = quoteFeedCallbacks[\"\(cb)\"]; " +
-            "quoteFeedCb({quotes:newQuotes, moreAvailable:true, attribution:{source:\"simulator\", exchange:\"RANDOM\"}});"
+        let script = "parseData('\(json)', \"\(cb)\"); "
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1315,7 +1189,7 @@ extension ChartIQView: WKScriptMessageHandler {
             }
         case .pullInitialData:
             let message = message.body as! [String: Any]
-            let cb = "Initial"
+            let cb = message["cb"] as? String ?? ""
             let symbol = message["symbol"] as? String ?? ""
             let startDate = message["startDate"] as? String ?? ""
             let endDate = message["endDate"] as? String ?? ""
