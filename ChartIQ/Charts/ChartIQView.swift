@@ -179,7 +179,7 @@ public class ChartIQView: UIView {
     }
     
     internal var layoutScript: WKUserScript {
-        let source = "addLayoutListener();"
+        let source = "addLayoutListener()"
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
@@ -863,13 +863,7 @@ public class ChartIQView: UIView {
     ///   - key: The parameter name that must be defined in CIQ.Studies.DialogHelper
     ///   - value: The value
     public func setStudy(_ name: String, withParameter key: String, value: String) {
-        let script = getStudyDescriptorScript(with: name) +
-            "var helper = new CIQ.Studies.DialogHelper({sd:selectedSd,stx:stxx}); " +
-            "var isFound = false; " +
-            "var newInputParameters = {}; " +
-            "var newOutputParameters = {}; " +
-            getUpdateStudyParametersScript(parameter: key, value: value) +
-            "helper.updateStudy({inputs:newInputParameters, outputs:newOutputParameters}); "
+        let script = "setStudy(\"\(name)\", \"\(key)\", \"\(value)\")"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setStudyParameter", parameters: ["parameter": key, "value": value])
     }
@@ -950,29 +944,13 @@ public class ChartIQView: UIView {
     /// Lists studies added on the Chart.
     ///
     /// - Returns: The array of Study name
+    
+    // abstract and maybe refactor
     public func getAddedStudyList() -> [Study] {
         var addedStudy = [Study]()
-        //let script =
-          //  "var list = []; " +
-            //"var s=stxx.layout.studies; " +
-            //"for(var n in s) { " +
-            //"   var sd=s[n]; " +
-            //"   list.push(sd.name + \"___\" + JSON.stringify(sd.inputs) + \"___\" + JSON.stringify(sd.outputs)); " +
-            //"} " +
-            //"list.join(\"|||\");"
-        
-        let script = "getActiveStudies();"
-        if let listString = webView.evaluateJavaScriptWithReturn(script), let data = listString.data(using: .utf8) {
+        let script = "getAddedStudies();"
+        if let listString = webView.evaluateJavaScriptWithReturn(script), !listString.isEmpty {
             let list = listString.components(separatedBy: "|||")
-            //let json = try JSONSerialization.jsonObject(with: data, options: [])
-            
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: [])
-                print(json)
-            } catch {
-                print("ERRROR(((((((((((((((((((((((((((((((((((((((((((((")
-            }
-
             list.forEach({ (study) in
                 let components = study.components(separatedBy: "___")
                 let name = components[0]
@@ -1262,5 +1240,4 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
 }
-
 
