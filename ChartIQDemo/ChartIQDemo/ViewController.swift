@@ -537,7 +537,6 @@ extension ViewController: ChartIQDelegate {
     
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
-            chartIQView.setChartIQUrl("")
             chartIQView.setRefreshInterval(refreshInterval)
             chartIQView.setDataMethod(.pull)
             chartIQView.setSymbol("APPL")
