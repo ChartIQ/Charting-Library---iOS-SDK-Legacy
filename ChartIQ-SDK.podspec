@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
   s.name             = 'ChartIQ'
-  s.version          = '1.0.0'
+  s.version          = '1.0.1'
   s.summary          = 'ChartIQ'
  
   s.description      = <<-DESC
-  						ChartIQ SDK for Swift
+ 	ChartIQ SDK for Swift
                        DESC
  
   s.homepage         = 'https://github.com/ChartIQ/Charting-Library---iOS-SDK'
