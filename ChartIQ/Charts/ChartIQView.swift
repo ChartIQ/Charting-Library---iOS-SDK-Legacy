@@ -187,6 +187,13 @@ public class ChartIQView: UIView {
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
+    internal var addAccessibilityModeScript: WKUserScript {
+        let accessibilityMode = UIAccessibilityIsVoiceOverRunning()
+        let accessibilityModeScript = "stxx.layout.accessibilityMode = \"\(accessibilityMode)\";"
+        
+        return WKUserScript(source: accessibilityModeScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    }
+    
     internal var studyObjects = [Study]()
     
     public var dataMethod: ChartIQDataMethod {
@@ -294,6 +301,7 @@ public class ChartIQView: UIView {
         case pullPaginationData = "pullPaginationDataHandler"
         case layout = "layoutHandler"
         case drawing = "drawingHandler"
+        case accessibility = "accessibilityHandler"
     }
     
     internal static var isValidApiKey = false
@@ -538,6 +546,7 @@ public class ChartIQView: UIView {
         userContentController.addUserScript(layoutScript)
         userContentController.addUserScript(drawingScript)
         
+        userContentController.add(self, name: ChartIQCallbackMessage.accessibility.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.newSymbol.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.pullInitialData.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.pullUpdateData.rawValue)
@@ -1234,6 +1243,10 @@ extension ChartIQView: WKScriptMessageHandler {
                 } catch {
                     print("Drawing callback fail")
                 }
+            }
+        case .accessibility:
+            if let quote = message.body as? String {
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, quote);
             }
         }
     }
