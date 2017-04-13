@@ -49,6 +49,15 @@ class ViewController: UIViewController {
     var selectedIntervalIndexPath = IndexPath(row: 0, section: 2)
     var selectedDrawTool: String?
     
+    // set field to true if voiceover mode needs to annouce the value
+    var voiceoverFields: [String: Bool] = ["Date": true,
+                                           "Close": true,
+                                           "Open": false,
+                                           "High": false,
+                                           "Low": false,
+                                           "Volume": false]
+    
+    
     enum SegueIdentifier: String {
         case searchStudiesSegue = "SearchStudiesSegue"
         case drawOptionsSegue = "DrawOptionsSegue"
@@ -537,6 +546,7 @@ extension ViewController: ChartIQDelegate {
     
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
+            chartIQView.setVoiceoverFields(voiceoverFields);
             chartIQView.setRefreshInterval(refreshInterval)
             chartIQView.setDataMethod(.pull)
             chartIQView.setSymbol("APPL")

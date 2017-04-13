@@ -154,13 +154,10 @@ public class ChartIQView: UIView {
     
     static internal var url = ""
     static internal var refreshInterval = 0
+    static internal var voiceoverFields: [String: Bool] = [:]
     
     public static var chartIQUrl: String {
         return ChartIQView.url
-    }
-    
-    public static var getRefreshInterval: Int {
-        return ChartIQView.refreshInterval
     }
     
     static internal var sdkVersion: String {
@@ -187,11 +184,9 @@ public class ChartIQView: UIView {
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
-    internal var addAccessibilityModeScript: WKUserScript {
-        let accessibilityMode = UIAccessibilityIsVoiceOverRunning()
-        let accessibilityModeScript = "stxx.layout.accessibilityMode = \"\(accessibilityMode)\";"
-        
-        return WKUserScript(source: accessibilityModeScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    internal var voiceoverScript: WKUserScript {
+        let source = "voiceoverMode()"
+        return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
     internal var studyObjects = [Study]()
@@ -535,6 +530,10 @@ public class ChartIQView: UIView {
         ChartIQView.refreshInterval = refreshInterval
     }
     
+    public func setVoiceoverFields(_ voiceoverFields: [String: Bool]) {
+        ChartIQView.voiceoverFields = voiceoverFields;
+    }
+    
     // MARK: - Layout
     
     /// setup WKWebView
@@ -545,6 +544,10 @@ public class ChartIQView: UIView {
         let userContentController = WKUserContentController()
         userContentController.addUserScript(layoutScript)
         userContentController.addUserScript(drawingScript)
+        
+        if(UIAccessibilityIsVoiceOverRunning()) {
+            userContentController.addUserScript(voiceoverScript)
+        }
         
         userContentController.add(self, name: ChartIQCallbackMessage.accessibility.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.newSymbol.rawValue)
@@ -1246,7 +1249,50 @@ extension ChartIQView: WKScriptMessageHandler {
             }
         case .accessibility:
             if let quote = message.body as? String {
-                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, quote);
+                let fieldsArray = quote.components(separatedBy: "||")
+
+                if fieldsArray.count == 6 {
+                    let date = fieldsArray[0]
+                    let close = fieldsArray[1]
+                    let open = fieldsArray[2]
+                    let high = fieldsArray[3]
+                    let low = fieldsArray[4]
+                    let volume = fieldsArray[5]
+                    
+                    // the below is very clunky, find a better way in the future
+                    // maybe first idea of passing in fields to library instead 
+                    // of getting everything back
+                    var selectedFields = ""
+                    
+                    if ChartIQView.voiceoverFields["Date"]! {
+                        selectedFields += ", " + date
+                    }
+                    
+                    if ChartIQView.voiceoverFields["Close"]! {
+                        selectedFields += ", " + close
+                    }
+                    
+                    if ChartIQView.voiceoverFields["Open"]! {
+                        selectedFields += ", " + open
+                    }
+                    
+                    if ChartIQView.voiceoverFields["High"]! {
+                        selectedFields += ", " + high
+                    }
+                    
+                    if ChartIQView.voiceoverFields["Low"]! {
+                        selectedFields += ", " + low
+                    }
+                    
+                    if ChartIQView.voiceoverFields["Volume"]! {
+                        selectedFields += ", " + volume
+                    }
+                    
+                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, selectedFields);
+                } else {
+                    // field is missing, just quote the entire value
+                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, quote);
+                }
             }
         }
     }
