@@ -549,7 +549,7 @@ extension ViewController: ChartIQDelegate {
             chartIQView.setVoiceoverFields(voiceoverFields);
             chartIQView.setRefreshInterval(refreshInterval)
             chartIQView.setDataMethod(.pull)
-            chartIQView.setSymbol("APPL")
+            chartIQView.setSymbol(defaultSymbol)
         }
         
         if let user = UserDefaults.standard.value(forKey: "SetUser") as? String {
