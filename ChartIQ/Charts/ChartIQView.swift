@@ -167,6 +167,16 @@ public class ChartIQView: UIView {
         return ""
     }
     
+    /// Quote Fields
+    enum ChartIQQuoteFields: String {
+        case date = "Date"
+        case close = "Close"
+        case open = "Open"
+        case high = "High"
+        case low = "Low"
+        case volume = "Volume"
+    }
+    
     static internal let rokoMobiEventUrl = URL(string:"https://api.roko.mobi/v1/events/")!
     static internal let rokoMobiSetUserUrl = "https://api.roko.mobi/v1/usersession/"
     static internal var customProperties = [String]()
@@ -185,7 +195,7 @@ public class ChartIQView: UIView {
     }
     
     internal var voiceoverScript: WKUserScript {
-        let source = "voiceoverMode()"
+        let source = "accessibilityMode()"
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
@@ -1264,27 +1274,27 @@ extension ChartIQView: WKScriptMessageHandler {
                     // of getting everything back
                     var selectedFields = ""
                     
-                    if ChartIQView.voiceoverFields["Date"]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
                         selectedFields += ", " + date
                     }
                     
-                    if ChartIQView.voiceoverFields["Close"]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
                         selectedFields += ", " + close
                     }
                     
-                    if ChartIQView.voiceoverFields["Open"]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
                         selectedFields += ", " + open
                     }
                     
-                    if ChartIQView.voiceoverFields["High"]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
                         selectedFields += ", " + high
                     }
                     
-                    if ChartIQView.voiceoverFields["Low"]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
                         selectedFields += ", " + low
                     }
                     
-                    if ChartIQView.voiceoverFields["Volume"]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
                         selectedFields += ", " + volume
                     }
                     
