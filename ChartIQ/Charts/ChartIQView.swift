@@ -168,7 +168,7 @@ public class ChartIQView: UIView {
     }
     
     /// Quote Fields
-    enum ChartIQQuoteFields: String {
+    public enum ChartIQQuoteFields: String {
         case date = "Date"
         case close = "Close"
         case open = "Open"
@@ -191,11 +191,6 @@ public class ChartIQView: UIView {
     
     internal var layoutScript: WKUserScript {
         let source = "addLayoutListener()"
-        return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-    }
-    
-    internal var voiceoverScript: WKUserScript {
-        let source = "accessibilityMode()"
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
@@ -552,12 +547,9 @@ public class ChartIQView: UIView {
         
         // Create the user content controller and add the script to it
         let userContentController = WKUserContentController()
+        
         userContentController.addUserScript(layoutScript)
         userContentController.addUserScript(drawingScript)
-        
-        if(UIAccessibilityIsVoiceOverRunning()) {
-            userContentController.addUserScript(voiceoverScript)
-        }
         
         userContentController.add(self, name: ChartIQCallbackMessage.accessibility.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.newSymbol.rawValue)
@@ -681,6 +673,11 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - symbol: The symbol for the new chart - a symbol string
     public func setSymbol(_ symbol: String) {
+        if(UIAccessibilityIsVoiceOverRunning()) {
+            let source = "accessibilityMode();"
+            webView.evaluateJavaScript(source, completionHandler: nil)
+        }
+        
         let script = "callNewChart(\"\(symbol)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setSymbol", parameters: ["symbol": symbol])
@@ -1278,23 +1275,23 @@ extension ChartIQView: WKScriptMessageHandler {
                         selectedFields += ", " + date
                     }
                     
-                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.close.rawValue]! {
                         selectedFields += ", " + close
                     }
                     
-                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.open.rawValue]! {
                         selectedFields += ", " + open
                     }
                     
-                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.high.rawValue]! {
                         selectedFields += ", " + high
                     }
                     
-                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.low.rawValue]! {
                         selectedFields += ", " + low
                     }
                     
-                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.date.rawValue]! {
+                    if ChartIQView.voiceoverFields[ChartIQQuoteFields.volume.rawValue]! {
                         selectedFields += ", " + volume
                     }
                     
