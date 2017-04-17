@@ -539,7 +539,19 @@ extension ViewController: ChartIQDelegate {
         func loadDefaultSymbol() {
             chartIQView.setRefreshInterval(refreshInterval)
             chartIQView.setDataMethod(.pull)
-            chartIQView.setSymbol("APPL")
+            chartIQView.setSymbol(defaultSymbol)
+        }
+        
+        func loadVoiceoverFields() {
+            // set field to true if voiceover mode needs to announce the value
+            let voiceoverFields: [String: Bool] = [ChartIQView.ChartIQQuoteFields.date.rawValue: true,
+                                                   ChartIQView.ChartIQQuoteFields.close.rawValue: true,
+                                                   ChartIQView.ChartIQQuoteFields.open.rawValue: false,
+                                                   ChartIQView.ChartIQQuoteFields.high.rawValue: false,
+                                                   ChartIQView.ChartIQQuoteFields.low.rawValue: false,
+                                                   ChartIQView.ChartIQQuoteFields.volume.rawValue: false]
+            
+            chartIQView.setVoiceoverFields(voiceoverFields);
         }
         
         if let user = UserDefaults.standard.value(forKey: "SetUser") as? String {
@@ -549,6 +561,8 @@ extension ViewController: ChartIQDelegate {
         } else {
             loadDefaultSymbol()
         }
+        
+        loadVoiceoverFields()
     }
     
     func chartIQView(_ chartIQView: ChartIQView, didUpdateLayout layout: Any) {
