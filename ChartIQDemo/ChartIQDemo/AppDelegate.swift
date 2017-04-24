@@ -13,8 +13,8 @@ import ChartIQ
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let url = "http://192.168.1.125:8080/3.0.0/default/template-basic.html"
-    let apiKey = "JGPHS0Pk6St63QUBdHk5uVZDM11T2Z1d1/BFz9E8HyI="
+    let url = "http://192.168.1.31:8080/3.0.0/default/template-basic.html"
+    let apiKey = "ZCeXudvZdX2xpAXv1XrRbc41EcMWk9lEsixYw8vNXUc="
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -44,6 +44,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+//    func rotated() {
+//        if UIDeviceOrientationIsLandscape(UIDevice.current.orientation) {
+//            print("Landscape")
+//        }
+//        
+//        if UIDeviceOrientationIsPortrait(UIDevice.current.orientation) {
+//            print("Portrait")
+//        }
+//    }
 
 }
 

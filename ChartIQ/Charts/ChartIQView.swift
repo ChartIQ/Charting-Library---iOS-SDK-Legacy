@@ -653,6 +653,10 @@ public class ChartIQView: UIView {
         addEvent("CHIQ_setChartType", parameters: ["chartType": "candle"])
     }
     
+    public func resizeChart() {
+        webView.evaluateJavaScript("stxx.resizeChart();", completionHandler: nil)
+    }
+    
     /// Sets the periodicity and interval for the chart. Interval describes the raw data interval (1, 5, 30, "day") while period describes the multiple of that interval (7 minutes, 3 days, 7 X 5 minutes). This method sets the new periodicity and creates a new dataSet.
     ///
     /// - Parameters:

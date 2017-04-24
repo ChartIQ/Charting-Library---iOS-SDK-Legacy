@@ -534,6 +534,45 @@ extension ViewController: ChartIQDataSource {
 // MARK: - ChartIQDelegate
 
 extension ViewController: ChartIQDelegate {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+//        if UIDevice.current.orientation.isLandscape {
+//            print("Landscape")
+//            //chartIQView.resizeChart()
+//        } else {
+//            //chartIQView.resizeChart()
+//            print("Portrait")
+//        }
+        
+        coordinator.animate(alongsideTransition: { context in
+            context.viewController(forKey: UITransitionContextViewControllerKey.from)
+            print("asdf")
+            // Stuff you used to do in willRotateToInterfaceOrientation would go here.
+            // If you don't need anything special, you can set this block to nil.
+        }, completion: { context in
+            print("qwer")
+            
+            //_ = self.setTimeout(delay: 5, block: { () -> Void in
+            //    self.chartIQView.resizeChart()
+            //})
+            //self.chartIQView.resizeChart()
+            // Stuff you used to do in didRotateFromInterfaceOrientation would go here.
+            // If not needed, set to nil.
+        })
+    }
+    
+    func setTimeout(delay:TimeInterval, block:@escaping ()->Void) -> Timer {
+        return Timer.scheduledTimer(timeInterval: delay, target: BlockOperation(block: block), selector: #selector(Operation.main), userInfo: nil, repeats: false)
+    }
+    
+    func setInterval(interval:TimeInterval, block:@escaping ()->Void) -> Timer {
+        return Timer.scheduledTimer(timeInterval: interval, target: BlockOperation(block: block), selector: #selector(Operation.main), userInfo: nil, repeats: true)
+    }
+    
+    // must be internal or public.
+    func update() {
+        // Something cool
+        chartIQView.resizeChart()
+    }
     
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
@@ -561,6 +600,10 @@ extension ViewController: ChartIQDelegate {
         } else {
             loadDefaultSymbol()
         }
+        
+        
+        
+        //NotificationCenter.default.addObserver(self, selector: #selector(AppDelegate.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
         loadVoiceoverFields()
     }

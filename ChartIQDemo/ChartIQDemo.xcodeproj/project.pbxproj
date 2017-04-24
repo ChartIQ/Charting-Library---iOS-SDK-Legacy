@@ -31,11 +31,11 @@
 		7AFE81651E41E6D1007C7A7A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AFE81631E41E6D1007C7A7A /* LaunchScreen.storyboard */; };
 		7AFE81701E41E6D1007C7A7A /* ChartIQDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFE816F1E41E6D1007C7A7A /* ChartIQDemoTests.swift */; };
 		7AFE817B1E41E6D1007C7A7A /* ChartIQDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFE817A1E41E6D1007C7A7A /* ChartIQDemoUITests.swift */; };
-		7AFE81911E41E714007C7A7A /* ChartIQ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AFE818E1E41E70D007C7A7A /* ChartIQ.framework */; };
-		7AFE81921E41E714007C7A7A /* ChartIQ.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7AFE818E1E41E70D007C7A7A /* ChartIQ.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7AFE81981E41E7AF007C7A7A /* SearchStudiesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFE81971E41E7AF007C7A7A /* SearchStudiesViewController.swift */; };
 		7AFE819A1E41E7BD007C7A7A /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFE81991E41E7BD007C7A7A /* TableViewCell.swift */; };
 		7AFE81A31E41FBBB007C7A7A /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFE81A21E41FBBB007C7A7A /* SettingViewController.swift */; };
+		C53A177E1EAE6C0E0023735E /* ChartIQ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AFE818E1E41E70D007C7A7A /* ChartIQ.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C53A177F1EAE6C0E0023735E /* ChartIQ.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7AFE818E1E41E70D007C7A7A /* ChartIQ.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,7 +67,7 @@
 			remoteGlobalIDString = 7AA3C6631E24975500DD69AE;
 			remoteInfo = ChartIQTests;
 		};
-		7AFE81931E41E714007C7A7A /* PBXContainerItemProxy */ = {
+		C53A17801EAE6C0E0023735E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7AFE81881E41E70D007C7A7A /* ChartIQ.xcodeproj */;
 			proxyType = 1;
@@ -77,13 +77,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		7AFE81951E41E714007C7A7A /* Embed Frameworks */ = {
+		C53A17821EAE6C0E0023735E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7AFE81921E41E714007C7A7A /* ChartIQ.framework in Embed Frameworks */,
+				C53A177F1EAE6C0E0023735E /* ChartIQ.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -132,7 +132,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7AFE81911E41E714007C7A7A /* ChartIQ.framework in Frameworks */,
+				C53A177E1EAE6C0E0023735E /* ChartIQ.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,12 +285,12 @@
 				7AFE81531E41E6D1007C7A7A /* Sources */,
 				7AFE81541E41E6D1007C7A7A /* Frameworks */,
 				7AFE81551E41E6D1007C7A7A /* Resources */,
-				7AFE81951E41E714007C7A7A /* Embed Frameworks */,
+				C53A17821EAE6C0E0023735E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				7AFE81941E41E714007C7A7A /* PBXTargetDependency */,
+				C53A17811EAE6C0E0023735E /* PBXTargetDependency */,
 			);
 			name = ChartIQDemo;
 			productName = ChartIQDemo;
@@ -491,10 +491,10 @@
 			target = 7AFE81561E41E6D1007C7A7A /* ChartIQDemo */;
 			targetProxy = 7AFE81771E41E6D1007C7A7A /* PBXContainerItemProxy */;
 		};
-		7AFE81941E41E714007C7A7A /* PBXTargetDependency */ = {
+		C53A17811EAE6C0E0023735E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ChartIQ;
-			targetProxy = 7AFE81931E41E714007C7A7A /* PBXContainerItemProxy */;
+			targetProxy = C53A17801EAE6C0E0023735E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -629,7 +629,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -649,7 +649,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
