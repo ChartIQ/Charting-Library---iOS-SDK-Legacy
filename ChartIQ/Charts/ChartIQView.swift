@@ -759,6 +759,23 @@ public class ChartIQView: UIView {
         addEvent("CHIQ_changeChartStyle", parameters: ["obj": obj, "attribute": attribute, "value": value])
     }
     
+    /// Change theme(night/day)
+    ///
+    /// - Parameters:
+    ///   - theme: The theme to apply
+    public func apply(theme: String) {
+        var script: String
+        switch theme {
+        case "night":
+            script = "$('body').addClass('ciq-night');"
+        default:
+            script = "$('body').addClass('ciq-day');"
+        }
+        script += "stxx.styles={}; stxx.chart.container.style.backgroundColor=''; if(stxx.displayInitialized) { stxx.headsUpHR(); stxx.clearPixelCache(); stxx.draw(); }"
+        
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Change a property value on the chart
     ///
     /// - Parameters:
