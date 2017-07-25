@@ -561,7 +561,7 @@ public class ChartIQView: UIView {
     
     /// setup WKWebView
     internal func setupWebView() {
-        guard ChartIQView.isValidApiKey else { return }
+       //guard ChartIQView.isValidApiKey else { return }
         
         // Create the user content controller and add the script to it
         let userContentController = WKUserContentController()
