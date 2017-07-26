@@ -200,9 +200,9 @@ public class ChartIQView: UIView {
         return _dataMethod
     }
     
-    public var dataSource: ChartIQDataSource?
+    weak public var dataSource: ChartIQDataSource?
     
-    public var delegate: ChartIQDelegate?
+    weak public var delegate: ChartIQDelegate?
     
     public var symbol: String {
         return webView.evaluateJavaScriptWithReturn("stxx.chart.symbol") ?? ""
