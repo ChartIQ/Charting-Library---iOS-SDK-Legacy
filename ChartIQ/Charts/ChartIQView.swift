@@ -302,6 +302,7 @@ public class ChartIQView: UIView {
         case layout = "layoutHandler"
         case drawing = "drawingHandler"
         case accessibility = "accessibilityHandler"
+        case log = "logHandler"
     }
     
     internal static var isValidApiKey = false
@@ -576,7 +577,8 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.pullPaginationData.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.layout.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.drawing.rawValue)
-        
+        userContentController.add(self, name: ChartIQCallbackMessage.log.rawValue)
+
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = userContentController
@@ -1334,6 +1336,21 @@ extension ChartIQView: WKScriptMessageHandler {
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, quote);
                 }
             }
+        // Allows for various console messages from JavaScript to show up in Xcode console.
+        // Accepted console methods are "log," "warning," and "error".
+        case .log:
+            let message = message.body as! [String: Any]
+            let method = message["method"] as? String ?? "LOG"
+            let arguments = message["arguments"] as! [String: String]
+            var msg: String = ""
+            for (_, value) in arguments {
+                if (msg.characters.count > 0) {
+                    msg += "\n"
+                }
+                
+                msg += value
+            }
+            NSLog("%@: %@", method, msg)
         }
     }
 }
@@ -1347,4 +1364,3 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
 }
-
