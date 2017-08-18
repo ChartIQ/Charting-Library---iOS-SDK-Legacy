@@ -618,6 +618,8 @@ public class ChartIQView: UIView {
         clear()
         _dataMethod = method
         addEvent("CHIQ_setDataMethod", parameters: ["method": method == .pull ? "PULL" : "PUSH"])
+        let script = "determineOs()"
+        webView.evaluateJavaScript(script, completionHandler: nil)
         if method == .pull {
             let script = "attachQuoteFeed(\(ChartIQView.refreshInterval))";
             webView.evaluateJavaScript(script, completionHandler: nil)
