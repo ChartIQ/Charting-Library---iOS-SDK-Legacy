@@ -764,10 +764,41 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - property: The property name of the object you wish to change
     ///   - value: The value to assign to the property
-    public func changeChartProperty(_ property: String, value: String) {
+    public func setChartProperty(_ property: String, value: String) {
         let script = "stxx.chart.\(property) = \"\(value)\";"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_changeChartProperty", parameters: ["property": property, "value": value])
+    }
+    
+    /// get a property value on the chart
+    ///
+    /// - Parameters:
+    ///   - property: The property name of the object you wish to receive
+    public func getChartProperty(_ property: String) -> String {
+        let script = "stxx.chart.\(property);"
+        addEvent("CHIQ_getChartProperty", parameters: ["property": property])
+        return webView.evaluateJavaScriptWithReturn(script)!
+    }
+    
+    /// Change a property value on the chart engine
+    ///
+    /// - Parameters:
+    ///   - property: The property name of the object you wish to change
+    ///   - value: The value to assign to the property
+    public func setEngineProperty(_ property: String, value: String) {
+        let script = "stxx.\(property) = \"\(value)\";"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+        addEvent("CHIQ_changeEngineProperty", parameters: ["property": property, "value": value])
+    }
+    
+    // get a property value on the chart engine
+    ///
+    /// - Parameters:
+    ///   - property: The property name of the object you wish to receive
+    public func getEngineProperty(_ property: String) -> String {
+        let script = "stxx.\(property);"
+        addEvent("CHIQ_getEngineProperty", parameters: ["property": property])
+        return webView.evaluateJavaScriptWithReturn(script)!
     }
     
     /// Turns crosshairs on
@@ -1142,7 +1173,7 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
-    public func invoke(functionName: String, args: Any...) -> Any {
+    public func invoke(functionName: String, callback: () -> Any, args: Any...) -> Any {
         let jsonData = try! JSONSerialization.data(withJSONObject: args, options: .prettyPrinted)
         let json = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
         
