@@ -1173,7 +1173,7 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
-    public func invoke(functionName: String, callback: () -> Any, args: Any...) -> Any {
+    public func invoke(functionName: String, args: Any...) -> Any {
         let jsonData = try! JSONSerialization.data(withJSONObject: args, options: .prettyPrinted)
         let json = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
         
