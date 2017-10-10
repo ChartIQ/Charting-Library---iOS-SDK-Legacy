@@ -781,10 +781,41 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - property: The property name of the object you wish to change
     ///   - value: The value to assign to the property
-    public func changeChartProperty(_ property: String, value: String) {
+    public func setChartProperty(_ property: String, value: Any) {
         let script = "stxx.chart.\(property) = \"\(value)\";"
         webView.evaluateJavaScript(script, completionHandler: nil)
-        addEvent("CHIQ_changeChartProperty", parameters: ["property": property, "value": value])
+        addEvent("CHIQ_changeChartProperty", parameters: ["property": property, "value": value as! String])
+    }
+    
+    /// get a property value on the chart
+    ///
+    /// - Parameters:
+    ///   - property: The property name of the object you wish to receive
+    public func getChartProperty(_ property: String) -> String {
+        let script = "stxx.chart.\(property);"
+        addEvent("CHIQ_getChartProperty", parameters: ["property": property])
+        return webView.evaluateJavaScriptWithReturn(script)!
+    }
+    
+    /// Change a property value on the chart engine
+    ///
+    /// - Parameters:
+    ///   - property: The property name of the object you wish to change
+    ///   - value: The value to assign to the property
+    public func setEngineProperty(_ property: String, value: Any) {
+        let script = "stxx.\(property) = \"\(value)\";"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+        addEvent("CHIQ_changeEngineProperty", parameters: ["property": property, "value": value as! String])
+    }
+    
+    // get a property value on the chart engine
+    ///
+    /// - Parameters:
+    ///   - property: The property name of the object you wish to receive
+    public func getEngineProperty(_ property: String) -> String {
+        let script = "stxx.\(property);"
+        addEvent("CHIQ_getEngineProperty", parameters: ["property": property])
+        return webView.evaluateJavaScriptWithReturn(script)!
     }
     
     /// Turns crosshairs on
@@ -820,6 +851,14 @@ public class ChartIQView: UIView {
             }
         }
         return nil
+    }
+    
+    /// Sets the theme for the chart
+    /// 'none' is there if the user wants to use custom themes they created
+    /// valid values: day, night, none
+    ///
+    public func setTheme(_ theme: String) {
+        webView.evaluateJavaScript("setTheme(\"\(theme)\");")
     }
     
     public func resizeChart() {
@@ -1151,6 +1190,31 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
+    public func invoke(functionName: String, args: Any...) -> Any {
+        let jsonData = try! JSONSerialization.data(withJSONObject: args, options: .prettyPrinted)
+        let json = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
+        
+        let script = "stxx.\(functionName)(\(json));"
+        let value = webView.evaluateJavaScriptWithReturn(script)
+        var result = ""
+
+        if value != nil {
+            result = unwrapOptional(any: value as Any) as! String
+        }
+        return result
+    }
+    
+    public func unwrapOptional(any:Any) -> Any {
+        let mi = Mirror(reflecting: any)
+        if mi.displayStyle != .optional {
+            return any
+        }
+        
+        if mi.children.count == 0 { return NSNull() }
+        let (_, some) = mi.children.first!
+        return some
+    }
+    
     // MARK: - Private
     
     /// Uses this method to load the default ChartIQView setting
@@ -1214,7 +1278,7 @@ public class ChartIQView: UIView {
     fileprivate func formatJSQuoteData(from data: [ChartIQData], cb: String) {
         let data = try! JSONSerialization.data(withJSONObject: data.map{ $0.toDictionary()}, options: .prettyPrinted)
         let json = String(data: data, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
-        let script = "parseData('\(json)', \"\(cb)\"); "
+        let script = "parseData('\(json)', \"\(cb)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1253,7 +1317,9 @@ extension ChartIQView: WKScriptMessageHandler {
             let params = ChartIQQuoteFeedParams(symbol: symbol, startDate: startDate, endDate: endDate, interval: interval, period: period)
             dataSource?.pullInitialData(by: params, completionHandler: {[weak self] (data) in
                 guard let strongSelf = self else { return }
-                strongSelf.formatJSQuoteData(from: data, cb: cb)
+                DispatchQueue.main.async {
+                    strongSelf.formatJSQuoteData(from: data, cb: cb)
+                }
             })
             addEvent("CHIQ_pullInitialData", parameters: ["symbol": symbol, "interval": String(period), "timeUnit": interval, "start": startDate, "end": endDate])
         case .pullUpdateData:
@@ -1267,7 +1333,9 @@ extension ChartIQView: WKScriptMessageHandler {
             let params = ChartIQQuoteFeedParams(symbol: symbol, startDate: startDate, endDate: endDate, interval: interval, period: period)
             dataSource?.pullUpdateData(by: params, completionHandler: {[weak self] (data) in
                 guard let strongSelf = self else { return }
-                strongSelf.formatJSQuoteData(from: data, cb: cb)
+                DispatchQueue.main.async {
+                    strongSelf.formatJSQuoteData(from: data, cb: cb)
+                }
             })
             addEvent("CHIQ_pullUpdate", parameters: ["symbol": symbol, "interval": String(period), "timeUnit": interval, "start": startDate])
         case .pullPaginationData:
@@ -1281,7 +1349,9 @@ extension ChartIQView: WKScriptMessageHandler {
             let params = ChartIQQuoteFeedParams(symbol: symbol, startDate: startDate, endDate: endDate, interval: interval, period: period)
             dataSource?.pullPaginationData(by: params, completionHandler: {[weak self] (data) in
                 guard let strongSelf = self else { return }
-                strongSelf.formatJSQuoteData(from: data, cb: cb)
+                DispatchQueue.main.async {
+                    strongSelf.formatJSQuoteData(from: data, cb: cb)
+                }
             })
             addEvent("CHIQ_pullPagination", parameters: ["symbol": symbol, "interval": String(period), "timeUnit": interval, "end": endDate])
         case .layout:
