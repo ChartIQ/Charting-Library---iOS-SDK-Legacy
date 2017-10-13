@@ -1338,9 +1338,9 @@ extension ChartIQView: WKScriptMessageHandler {
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, quote);
                 }
             }
+        case .log:
         // Allows for various console messages from JavaScript to show up in Xcode console.
         // Accepted console methods are "log," "warning," and "error".
-        case .log:
             let message = message.body as! [String: Any]
             let method = message["method"] as? String ?? "LOG"
             let arguments = message["arguments"] as! [String: String]
