@@ -776,6 +776,22 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
+    /// Set watermark
+    ///
+    /// - Parameters:
+    ///   - value: Set or don't set
+    public func setWatermark(_ value: Bool) {
+        var script: String
+        switch value {
+        case true:
+            script = "setWatermark(true);"
+        case false:
+            script = "setWatermark(false);"
+        }
+        
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Change a property value on the chart
     ///
     /// - Parameters:
