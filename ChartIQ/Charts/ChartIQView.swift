@@ -934,7 +934,7 @@ public class ChartIQView: UIView {
                             if let name = studyDict["name"] as? String, !name.isEmpty {
                                 studyName = name
                             }
-                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?)
+                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?, type: "")
                             strongSelf.studyObjects.append(study)
                         }
                     }
@@ -1088,6 +1088,7 @@ public class ChartIQView: UIView {
                 let name = components[0]
                 let inputString = components[1]
                 let outputString = components[2]
+                let typeString = components[3]
                 var inputs: [String: Any]?
                 var outputs: [String: Any]?
                 if !inputString.isEmpty, let data = inputString.data(using: .utf8) {
@@ -1096,7 +1097,7 @@ public class ChartIQView: UIView {
                 if !outputString.isEmpty, let data = outputString.data(using: .utf8) {
                     outputs = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
                 }
-                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs)
+                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs, type: typeString)
                 addedStudy.append(studyObject)
             })
         }
