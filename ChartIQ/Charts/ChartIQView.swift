@@ -933,7 +933,7 @@ public class ChartIQView: UIView {
             if let inputs = json as? [[String: Any]] {
                 return inputs.filter({ (input) -> Bool in
                     let name = input["name"] as? String
-                    return name != nil && name != "id" && name != "display" && !name!.hasSuffix(" Period")
+                    return name != nil && name != "id" && name != "display"
                 })
             }
             return json
