@@ -792,6 +792,15 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
+    /// Set decimal places
+    ///
+    /// - Parameters:
+    ///   - decimalPlaces: number of decimal places
+    public func setDecimalPlaces(_ decimalPlaces: Int) {
+        let script = "stxx.chart.yAxis.decimalPlaces=\(decimalPlaces)"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Change a property value on the chart
     ///
     /// - Parameters:
@@ -902,7 +911,7 @@ public class ChartIQView: UIView {
         let script =
             "callNewChart(\"\", \(jsonString!)); "
         webView.evaluateJavaScript(script, completionHandler: nil)
-        addEvent("CHIQ_pushInitialData", parameters: ["symbol": symbol, "data": jsonString!])
+//        addEvent("CHIQ_pushInitialData", parameters: ["symbol": symbol, "data": jsonString!])
     }
     
     /// Uses this method to stream OHLC data into a chart.
@@ -914,7 +923,7 @@ public class ChartIQView: UIView {
         let jsonString = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
         let script = "parseData('\(jsonString)');"
         webView.evaluateJavaScript(script, completionHandler: nil)
-        addEvent("CHIQ_pushUpdate", parameters: ["symbol": symbol, "data": jsonString])
+//        addEvent("CHIQ_pushUpdate", parameters: ["symbol": symbol, "data": jsonString])
     }
     
     // MARK: - Study
