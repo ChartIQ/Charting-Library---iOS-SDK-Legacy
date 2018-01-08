@@ -14,6 +14,7 @@ open class ChartUtils {
     
     public static var chartDateFormatter: DateFormatter {
         _defaultDateFormatter.timeZone = TimeZone(identifier: "UTC")
+        _defaultDateFormatter.locale = Locale(identifier: "en_US_POSIX")
         _defaultDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.sss'Z'" // "YYYY-MM-dd"
         return _defaultDateFormatter
     }
