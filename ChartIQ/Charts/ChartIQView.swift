@@ -1421,10 +1421,10 @@ extension ChartIQView: WKScriptMessageHandler {
             let arguments = message["arguments"] as! [String: String]
             var msg: String = ""
             for (_, value) in arguments {
-                if (msg.characters.count > 0) {
+                if (msg.count > 0) {
                     msg += "\n"
                 }
-                
+
                 msg += value
             }
             NSLog("%@: %@", method, msg)
@@ -1433,11 +1433,11 @@ extension ChartIQView: WKScriptMessageHandler {
 }
 
 extension ChartIQView : WKNavigationDelegate {
-    
+
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         getStudyObjects()
         loadDefaultSetting()
         delegate?.chartIQViewDidFinishLoading(self)
     }
-    
+
 }
