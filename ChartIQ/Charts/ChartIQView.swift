@@ -1053,7 +1053,7 @@ public class ChartIQView: UIView {
         var addedStudy = [Study]()
         let script = "getAddedStudies();"
         if let listString = webView.evaluateJavaScriptWithReturn(script), !listString.isEmpty {
-            let list = listString.components(separatedBy: "|||")
+            let list = listString.components(separatedBy: "||")
             list.forEach({ (study) in
                 let components = study.components(separatedBy: "___")
                 var name = components[0]
