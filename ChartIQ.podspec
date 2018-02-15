@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ChartIQ'
-  s.version          = '1.0.12’
+  s.version          = '1.0.13’
   s.summary          = 'ChartIQ'
  
   s.description      = <<-DESC
