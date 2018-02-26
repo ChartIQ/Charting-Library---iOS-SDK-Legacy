@@ -8,8 +8,8 @@
 
 import UIKit
 
-open class Study: NSObject {
-
+open class Study: NSObject, NSCoding {
+    
     open var shortName = ""
     open var name = ""
     open var inputs: [String: Any]?
@@ -26,4 +26,19 @@ open class Study: NSObject {
         self.type = type
     }
     
+    required public init(coder aDecoder: NSCoder) {
+        self.shortName = aDecoder.decodeObject(forKey: "shortName") as! String
+        self.name = aDecoder.decodeObject(forKey: "name") as! String
+        self.type = aDecoder.decodeObject(forKey: "type") as! String
+        self.inputs = aDecoder.decodeObject(forKey: "inputs") as? [String: Any]
+    }
+    
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(name, forKey: "name")
+        aCoder.encode(shortName, forKey: "shortName")
+        aCoder.encode(type, forKey: "type")
+        aCoder.encode(inputs, forKey: "inputs")
+    }
+    
 }
+
