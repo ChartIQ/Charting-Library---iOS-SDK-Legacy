@@ -937,10 +937,13 @@ public class ChartIQView: UIView {
     // MARK: - Study
     
     /// Gets all of the available studies.
-    fileprivate func getStudyObjects() {
+    fileprivate func getStudyObjects(completionHandler: @escaping () -> Void) {
         let script = "JSON.stringify(CIQ.Studies.studyLibrary);"
         webView.evaluateJavaScript(script) { [weak self](result, error) in
-            guard let strongSelf = self else { return }
+            guard let strongSelf = self else {
+                completionHandler()
+                return
+            }
             strongSelf.studyObjects = [Study]()
             if let result = result as? String, let data = result.data(using: .utf8) {
                 let json = try! JSONSerialization.jsonObject(with: data, options: [])
@@ -958,6 +961,7 @@ public class ChartIQView: UIView {
                     strongSelf.studyObjects.sort{ $0.name.localizedCaseInsensitiveCompare($1.name) == ComparisonResult.orderedAscending  }
                 }
             }
+            completionHandler()
         }
     }
     
@@ -1481,9 +1485,13 @@ extension ChartIQView: WKScriptMessageHandler {
 extension ChartIQView : WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        getStudyObjects()
-        loadDefaultSetting()
-        delegate?.chartIQViewDidFinishLoading(self)
+        getStudyObjects(completionHandler: { [weak self] in
+            guard let strongSelf = self else {
+                return
+            }
+            strongSelf.loadDefaultSetting()
+            strongSelf.delegate?.chartIQViewDidFinishLoading(strongSelf)
+        })
     }
 
 }
