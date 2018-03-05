@@ -775,11 +775,11 @@ public class ChartIQView: UIView {
         var script: String
         switch theme {
         case "night":
-            script = "$('body').addClass('ciq-night');"
+            script = "$('body').removeClass('ciq-day'); $('body').addClass('ciq-night');"
         default:
-            script = "$('body').addClass('ciq-day');"
+            script = "$('body').removeClass('ciq-night'); $('body').addClass('ciq-day');"
         }
-        script += "stxx.styles={}; stxx.chart.container.style.backgroundColor=''; if(stxx.displayInitialized) { stxx.headsUpHR(); stxx.clearPixelCache(); stxx.draw(); }"
+        script += "stxx.clearStyles();"
         
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
