@@ -13,7 +13,7 @@ import ChartIQ
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let url = "http://wildflydevgr.tradingpoint.com:18080/chartiq/xm-native-sdk.html"
+    let url = "https://staging-webtrader.xm.com/mobchartiq/xmcom-5.1.2/xm-native-sdk-test.html"
     let apiKey = ""
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
