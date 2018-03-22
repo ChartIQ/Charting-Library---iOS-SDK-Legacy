@@ -1133,6 +1133,20 @@ public class ChartIQView: UIView {
     
     // MARK: - Drawing
     
+    public func exportDrawingObjects() -> Any? {
+        let script = "JSON.stringify(stxx.exportDrawings())"
+        
+        if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
+            return try? JSONSerialization.jsonObject(with: data, options: [])
+        }
+        return nil
+    }
+    
+    public func importDrawings(_ jsonString: String) {
+        let script = "stxx.importDrawings(\(jsonString)); stxx.draw();"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Gets current draw tool
     public func getCurrentDrawTool() -> ChartIQDrawingTool? {
         let name = webView.evaluateJavaScriptWithReturn("currentDrawing")
