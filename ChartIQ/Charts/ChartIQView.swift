@@ -595,10 +595,10 @@ public class ChartIQView: UIView {
         addSubview(webView)
         setupConstraints()
 
-        if let url = URL(string: ChartIQView.chartIQUrl) {
-            webView.load(URLRequest(url: url))
-            addEvent("_ROKO.Active User")
-        }
+//        if let url = URL(string: ChartIQView.chartIQUrl) {
+//            webView.load(URLRequest(url: url))
+//            addEvent("_ROKO.Active User")
+//        }
     }
     
     /// Setup constraints
@@ -708,6 +708,40 @@ public class ChartIQView: UIView {
         let script = "callNewChart(\"\(symbol)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setSymbol", parameters: ["symbol": symbol])
+    }
+    
+    /*! Renders a chart for a particular instrument and periodicity. This is the method that should be called every time a new chart needs to be drawn for a different instrument.
+     @param symbol The symbol for the new chart.
+     @param period: The number of elements from masterData to roll-up together into one data point on the chart (one candle, for example). If set to 30 in a candle chart, for example, each candle will represent 30 raw elements of interval type.
+     @param interval: The type of data to base the period on. This can be a numeric value representing minutes, seconds or millisecond as inicated by timeUnit, "day","week", "month" or 'tick' for variable time x-axis.     
+     */
+    public func xm_setSymbol(_ symbol: String, period: Int, interval: String) {
+        let script =
+            """
+            xm_callNewChart("\(symbol)", \(period), "\(interval)")
+            """
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    /*! Sets the webpage contents and base URL.
+     @param string The string to use as the contents of the webpage.
+     @param baseURL A URL that is used to resolve relative URLs within the document.
+     @result A new navigation.
+     */
+    public func xm_load(htmlString: String, baseURL: URL?) {
+        webView.loadHTMLString(htmlString, baseURL: baseURL)
+    }
+    
+    /// Used to invoke Javascript code for debugging
+    public func xm_doSomething() {
+        let script = "doSomething()";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    /// Used to print debug info in Javascript console
+    public func xm_printSomething(text: String) {
+        let script = "printSomething(\"\(text)\")";
+        webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
     /// Renders a chart for a particular instrument from the data passed in or fetches new data from the attached CIQ.QuoteFeed. This is the method that should be called every time a new chart needs to be drawn for a different instrument.
@@ -1493,6 +1527,7 @@ extension ChartIQView: WKScriptMessageHandler {
                 msg += value
             }
             NSLog("%@: %@", method, msg)
+            print("\(method) \(msg)")            
         }
     }
 }
