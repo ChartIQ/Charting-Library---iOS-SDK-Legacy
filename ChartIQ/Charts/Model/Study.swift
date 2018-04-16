@@ -20,7 +20,7 @@ open class Study: NSObject, NSCoding {
         super.init()
         
         self.shortName = shortName
-        self.name = name
+        self.name = name.replacingOccurrences(of: "|", with: "")
         self.inputs = inputs
         self.outputs = outputs
         self.type = type
