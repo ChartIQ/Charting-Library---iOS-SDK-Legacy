@@ -65,6 +65,9 @@ public protocol ChartIQDelegate
     ///   - chartIQView: The ChartIQView Object
     ///   - drawings: The drawing objects in JSON format
     @objc optional func chartIQView(_ chartIQView: ChartIQView, didUpdateDrawing drawings: Any)
+    
+    /// Called when Javascript produces an error -XM
+    @objc func didReceiveJavascriptError(with message: String)
 }
 
 /// Data Method
@@ -1527,7 +1530,10 @@ extension ChartIQView: WKScriptMessageHandler {
                 msg += value
             }
             NSLog("%@: %@", method, msg)
-            print("\(method) \(msg)")            
+            print("\(method) \(msg)")
+            if method == "ERROR" {
+                delegate?.didReceiveJavascriptError(with: msg)
+            }
         }
     }
 }
