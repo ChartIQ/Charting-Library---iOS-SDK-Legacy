@@ -1542,8 +1542,10 @@ extension ChartIQView: WKScriptMessageHandler {
                 delegate?.didReceiveJavascriptError(with: msg)
             }
         case .deletedStudy:
-            let message = message.body as! [String: Any]
-            let deletedStudy = message["deletedStudy"] as? String ?? "None"
+            guard let message = message.body as? [String: Any],
+                let deletedStudy = message["deletedStudy"] as? String else {
+                    return
+            }
             delegate?.chartIQView(self, didDeleteStudy: deletedStudy)
         }
     }
