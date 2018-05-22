@@ -200,6 +200,11 @@ public class ChartIQView: UIView {
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
     
+    internal var observeStudyDeletion: WKUserScript {
+        let source = "observeStudyDeletion()"
+        return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    }
+    
     internal var studyObjects = [Study]()
     
     public var dataMethod: ChartIQDataMethod {
@@ -579,6 +584,7 @@ public class ChartIQView: UIView {
         
         userContentController.addUserScript(layoutScript)
         userContentController.addUserScript(drawingScript)
+        userContentController.addUserScript(observeStudyDeletion)
         
         userContentController.add(self, name: ChartIQCallbackMessage.accessibility.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.newSymbol.rawValue)
