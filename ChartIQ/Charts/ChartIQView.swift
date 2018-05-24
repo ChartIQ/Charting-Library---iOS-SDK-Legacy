@@ -985,6 +985,14 @@ public class ChartIQView: UIView {
         //        addEvent("CHIQ_pushUpdate", parameters: ["symbol": symbol, "data": jsonString])
     }
     
+    /// Uses this method to show the ask price line into a chart.
+    ///
+    /// - Parameter askPrice: A double value of the Ask price
+    public func drawAskLine(_ askPrice: Double) {
+        let script = "drawAskLine('\(askPrice)');"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     // MARK: - Study
     
     /// Gets all of the available studies.
