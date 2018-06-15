@@ -989,7 +989,10 @@ public class ChartIQView: UIView {
     ///
     /// - Parameter shouldShow: A boolean value from settings to see if ask price should be shown.
     public func shouldShowAskPrice(shouldShow: Bool) {
-        let script = "shouldDrawAskLine(\(shouldShow));"
+        let script = """
+                     shouldDrawAskLineFunction(\(shouldShow));
+                     stxx.draw();
+                     """
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
