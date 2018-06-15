@@ -998,10 +998,11 @@ public class ChartIQView: UIView {
     /// - Parameter askPrice: A double value of the Ask price which we are going to
     ///   Next will redraw the chart so we can see the changes immediately
     public func drawAskLine(askPrice: Double) {
-        let script = "drawAskLine(\(askPrice));"
+        let script = """
+                     drawAskLine(\(askPrice));
+                     stxx.draw();
+                     """
         webView.evaluateJavaScript(script, completionHandler: nil)
-        let drawScript = "stxx.draw();"
-        webView.evaluateJavaScript(drawScript, completionHandler: nil)
     }
     
     // MARK: - Study
