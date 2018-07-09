@@ -72,8 +72,8 @@ public protocol ChartIQDelegate
     /// Called when a user deletes a Study from the ChartIQ
     @objc func chartIQView(_ chartIQView: ChartIQView, didDeleteStudy name: String)
     
-    /// Called when a user taps on the screen
-    @objc func userInteractedOnChartScreen()
+    /// Called when a user taps on the screen and we receive a callback from JS that the user tapped or moved the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
+    @objc func chartIQViewDidTapOnChart(_ chartIQView: ChartIQView)
     
 }
 
@@ -1584,7 +1584,7 @@ extension ChartIQView: WKScriptMessageHandler {
             }
             delegate?.chartIQView(self, didDeleteStudy: deletedStudy)
         case .userInteractedOnChartScreen:
-            delegate?.userInteractedOnChartScreen()
+            delegate?.chartIQViewDidTapOnChart(self)
         }
     }
 }
