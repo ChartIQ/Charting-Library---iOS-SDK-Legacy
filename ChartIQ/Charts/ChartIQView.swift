@@ -71,6 +71,10 @@ public protocol ChartIQDelegate
     
     /// Called when a user deletes a Study from the ChartIQ
     @objc func chartIQView(_ chartIQView: ChartIQView, didDeleteStudy name: String)
+    
+    /// Called when a user taps on the screen
+    @objc func userInteractedOnChartScreen()
+    
 }
 
 /// Data Method
@@ -315,6 +319,7 @@ public class ChartIQView: UIView {
         case accessibility = "accessibilityHandler"
         case log = "logHandler"
         case deletedStudy = "deletedStudy"
+        case userInteractedOnChartScreen = "userInteractedOnChartScreen"
     }
     
     internal static var isValidApiKey = false
@@ -363,6 +368,7 @@ public class ChartIQView: UIView {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawing.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.log.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.deletedStudy.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.userInteractedOnChartScreen.rawValue)
         
     }
     
@@ -595,6 +601,7 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.drawing.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.log.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.deletedStudy.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.userInteractedOnChartScreen.rawValue)
         
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
@@ -904,14 +911,14 @@ public class ChartIQView: UIView {
     
     /// Turns crosshairs on
     public func enableCrosshairs() {
-        let script = "enableCrosshairs(true);"
+        let script = "enableCrosshair();"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_enableCrosshairs")
     }
     
     /// Turns crosshairs off
     public func disableCrosshairs() {
-        let script = "enableCrosshairs(false);"
+        let script = "disableCrosshair();"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_disableCrosshairs")
     }
@@ -1576,6 +1583,8 @@ extension ChartIQView: WKScriptMessageHandler {
                     return
             }
             delegate?.chartIQView(self, didDeleteStudy: deletedStudy)
+        case .userInteractedOnChartScreen:
+            delegate?.userInteractedOnChartScreen()
         }
     }
 }
