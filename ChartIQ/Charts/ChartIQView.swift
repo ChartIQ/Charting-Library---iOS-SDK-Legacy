@@ -72,8 +72,11 @@ public protocol ChartIQDelegate
     /// Called when a user deletes a Study from the ChartIQ
     @objc func chartIQView(_ chartIQView: ChartIQView, didDeleteStudy name: String)
     
-    /// Called when a user taps on the screen and we receive a callback from JS that the user tapped or moved the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
+    /// Called when a user taps on the screen and we receive a callback from JS that the user tapped the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
     @objc func chartIQViewDidTapOnChart(_ chartIQView: ChartIQView)
+    
+    /// Called when a user drags the screen and we receive a callback from JS that the user moved the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
+    @objc func chartIQViewDidMoveChart(_ chartIQView: ChartIQView)
     
 }
 
@@ -319,7 +322,8 @@ public class ChartIQView: UIView {
         case accessibility = "accessibilityHandler"
         case log = "logHandler"
         case deletedStudy = "deletedStudy"
-        case userInteractedOnChartScreen = "userInteractedOnChartScreen"
+        case userTapOnChartScreen = "userTapOnChartScreen"
+        case userMovedChartScreen = "userMovedChartScreen"
     }
     
     internal static var isValidApiKey = false
@@ -368,7 +372,9 @@ public class ChartIQView: UIView {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawing.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.log.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.deletedStudy.rawValue)
-        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.userInteractedOnChartScreen.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.userTapOnChartScreen.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.userMovedChartScreen.rawValue)
+
         
     }
     
@@ -601,7 +607,9 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.drawing.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.log.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.deletedStudy.rawValue)
-        userContentController.add(self, name: ChartIQCallbackMessage.userInteractedOnChartScreen.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.userTapOnChartScreen.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.userMovedChartScreen.rawValue)
+
         
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
@@ -1583,8 +1591,10 @@ extension ChartIQView: WKScriptMessageHandler {
                     return
             }
             delegate?.chartIQView(self, didDeleteStudy: deletedStudy)
-        case .userInteractedOnChartScreen:
+        case .userTapOnChartScreen:
             delegate?.chartIQViewDidTapOnChart(self)
+        case .userMovedChartScreen:
+            delegate?.chartIQViewDidMoveChart(self)
         }
     }
 }
