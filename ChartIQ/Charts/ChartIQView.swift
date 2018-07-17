@@ -763,6 +763,14 @@ public class ChartIQView: UIView {
         webView.loadHTMLString(htmlString, baseURL: baseURL)
     }
     
+    /// Used to add a Ellipse Drawing Quickly to the Chart
+    /// TODO: Will Be Deleted when we finish drawing tasks
+    
+    public func xm_AddEllipse() {
+        let script = "addEllipse()";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Used to invoke Javascript code for debugging
     public func xm_doSomething() {
         let script = "doSomething()";
