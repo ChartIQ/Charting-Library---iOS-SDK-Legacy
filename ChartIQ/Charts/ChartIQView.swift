@@ -183,6 +183,7 @@ public enum ChartIQDrawingTool: Int {
     case ray
     case rectangle
     case segment
+    case trendline
     case verticalLine
 }
 
@@ -1328,6 +1329,7 @@ public class ChartIQView: UIView {
         case .ray: return "ray"
         case .rectangle: return "rectangle"
         case .segment: return "segment"
+        case .trendline: return "trendline"
         case .verticalLine: return "vertical"
         }
     }
@@ -1337,7 +1339,7 @@ public class ChartIQView: UIView {
     /// - Parameter tool: The draw tool
     public func isSupportingFill(for tool: ChartIQDrawingTool) -> Bool {
         switch tool {
-        case .channel, .ellipse, .fibarc, .fibfan, .fibretrace, .fibtimezone, .gartley, .rectangle, .segment: return true
+        case .channel, .ellipse, .fibarc, .fibfan, .fibretrace, .fibtimezone, .gartley, .rectangle, .segment, .trendline: return true
         default: return false
         }
     }
