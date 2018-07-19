@@ -805,7 +805,7 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - name: The string name of the Drawing we want to add
     public func xm_AddDrawing(name: String) {
-        let script = "addDrawing(\(name))";
+        let script = "addDrawing(\"\(name)\")";
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
