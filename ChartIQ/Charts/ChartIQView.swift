@@ -1296,7 +1296,7 @@ public class ChartIQView: UIView {
     }
     
     public func importDrawings(_ jsonString: String) {
-        let script = "stxx.importDrawings(\(jsonString)); stxx.draw();"
+        let script = "stxx.importXMDrawings(\(jsonString)); stxx.draw();"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
