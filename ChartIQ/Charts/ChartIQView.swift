@@ -73,10 +73,38 @@ public protocol ChartIQDelegate
     @objc func chartIQView(_ chartIQView: ChartIQView, didDeleteStudy name: String)
     
     /// Called when a user taps on the screen and we receive a callback from JS that the user tapped the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
     @objc func chartIQViewDidTapOnChart(_ chartIQView: ChartIQView)
     
     /// Called when a user drags the screen and we receive a callback from JS that the user moved the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
     @objc func chartIQViewDidMoveChart(_ chartIQView: ChartIQView)
+    
+    
+    /// Called when a drawing is added in the Chart
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - drawing: The Drawing that was added in Chart
+    @objc func chartIQViewDidAddDrawing(_ chartIQView: ChartIQView, didAddDrawing drawing: Any)
+    
+    /// Called when a drawing is added in the Chart
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - drawing: The Drawing that was edited in Chart
+    @objc func chartIQViewDidEditDrawing(_ chartIQView: ChartIQView, didEditDrawing drawing: Any)
+    
+    /// Called when a drawing is added in the Chart
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - drawing: The Drawing that was removed from the Chart
+    @objc func chartIQViewDidRemoveDrawing(_ chartIQView: ChartIQView, didRemoveDrawing drawing: Any)
     
 }
 
@@ -324,6 +352,9 @@ public class ChartIQView: UIView {
         case deletedStudy = "deletedStudy"
         case userTapOnChartScreen = "userTapOnChartScreen"
         case userMovedChartScreen = "userMovedChartScreen"
+        case drawingAdded = "drawingAdded"
+        case drawingEdited = "drawingEdited"
+        case drawingRemoved = "drawingRemoved"
     }
     
     internal static var isValidApiKey = false
@@ -374,6 +405,9 @@ public class ChartIQView: UIView {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.deletedStudy.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.userTapOnChartScreen.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.userMovedChartScreen.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingAdded.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingEdited.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingRemoved.rawValue)
 
         
     }
@@ -609,6 +643,9 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.deletedStudy.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.userTapOnChartScreen.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.userMovedChartScreen.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.drawingAdded.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.drawingEdited.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.drawingRemoved.rawValue)
 
         
         // Create the configuration with the user content controller
@@ -763,11 +800,30 @@ public class ChartIQView: UIView {
         webView.loadHTMLString(htmlString, baseURL: baseURL)
     }
     
-    /// Used to add a Ellipse Drawing Quickly to the Chart
-    /// TODO: Will Be Deleted when we finish drawing tasks
+    /// Used to add a Drawing to the Chart, in Edit Mode
+    ///
+    /// - Parameters:
+    ///   - name: The string name of the Drawing we want to add
+    public func xm_AddDrawing(name: String) {
+        let script = "addDrawing(\(name))";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
     
-    public func xm_AddEllipse() {
-        let script = "addEllipse()";
+    /// Used to edit a Drawing to the Chart, If its not in the visible area will scroll to its position
+    ///
+    /// - Parameters:
+    ///   - id: The id of the Drawing we want to edit in chart, its the timestamp of the when the drawing was added
+    public func xm_EditDrawing(id: Int) {
+        let script = "editDrawing(\(id))";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    /// Used to remove a Drawing to the Chart, If its not in the visible area will be just removed
+    ///
+    /// - Parameters:
+    ///   - id: The id of the Drawing we want to edit in chart, its the timestamp of the when the drawing was added
+    public func xm_RemoveDrawing(id: Int) {
+        let script = "removeDrawing(\(id))";
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1603,6 +1659,24 @@ extension ChartIQView: WKScriptMessageHandler {
             delegate?.chartIQViewDidTapOnChart(self)
         case .userMovedChartScreen:
             delegate?.chartIQViewDidMoveChart(self)
+        case .drawingAdded:
+            guard let message = message.body as? [String: Any],
+                let addedDrawing = message["drawingAdded"] as? String else {
+                    return
+            }
+            delegate?.chartIQViewDidAddDrawing(self, didAddDrawing: addedDrawing)
+        case .drawingEdited:
+            guard let message = message.body as? [String: Any],
+                let editingDrawing = message["drawingEdited"] as? String else {
+                    return
+            }
+            delegate?.chartIQViewDidEditDrawing(self, didEditDrawing: editingDrawing)
+        case .drawingRemoved:
+            guard let message = message.body as? [String: Any],
+                let removedDrawing = message["drawingRemoved"] as? String else {
+                    return
+            }
+            delegate?.chartIQViewDidRemoveDrawing(self, didRemoveDrawing: removedDrawing)
         }
     }
 }
