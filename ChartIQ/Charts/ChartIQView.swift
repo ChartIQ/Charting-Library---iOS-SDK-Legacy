@@ -106,6 +106,22 @@ public protocol ChartIQDelegate
     ///   - drawing: The Drawing that was removed from the Chart
     @objc func chartIQViewDidRemoveDrawing(_ chartIQView: ChartIQView, didRemoveDrawing drawing: Any)
     
+    /// Called when a drawing is added in the Chart
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - drawing: The Drawing that was removed from the Chart
+    @objc func chartIQViewDidReceiveError(_ chartIQView: ChartIQView, errorCode error: ChartIQErrorHandler)
+    
+}
+
+/// ChartIQ Custom XM Error Handler
+@objc
+public enum ChartIQErrorHandler: Int {
+    case addDrawingFailed
+    case drawingDoesNotExist
+    case removeDrawingFailed
+    case drawingNotInDataSet
 }
 
 /// Data Method
@@ -356,6 +372,7 @@ public class ChartIQView: UIView {
         case drawingAdded = "drawingAdded"
         case drawingEdited = "drawingEdited"
         case drawingRemoved = "drawingRemoved"
+        case errorHandler = "error"
     }
     
     internal static var isValidApiKey = false
@@ -409,7 +426,7 @@ public class ChartIQView: UIView {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingAdded.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingEdited.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingRemoved.rawValue)
-
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.errorHandler.rawValue)
         
     }
     
@@ -647,7 +664,7 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.drawingAdded.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.drawingEdited.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.drawingRemoved.rawValue)
-
+        userContentController.add(self, name: ChartIQCallbackMessage.errorHandler.rawValue)
         
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
@@ -1679,6 +1696,23 @@ extension ChartIQView: WKScriptMessageHandler {
                     return
             }
             delegate?.chartIQViewDidRemoveDrawing(self, didRemoveDrawing: removedDrawing)
+        case .errorHandler:
+            guard let message = message.body as? [String: Any],
+                let errorCode = message["errorCode"] as? Int else {
+                    return
+            }
+            switch errorCode {
+            case -1:
+                delegate?.chartIQViewDidReceiveError(self, errorCode: .addDrawingFailed)
+            case -2:
+                delegate?.chartIQViewDidReceiveError(self, errorCode: .drawingDoesNotExist)
+            case -3:
+                delegate?.chartIQViewDidReceiveError(self, errorCode: .removeDrawingFailed)
+            case -4:
+                delegate?.chartIQViewDidReceiveError(self, errorCode: .drawingNotInDataSet)
+            default:
+                break
+            }
         }
     }
 }
