@@ -122,6 +122,7 @@ public enum ChartIQErrorHandler: Int {
     case drawingDoesNotExist
     case removeDrawingFailed
     case drawingNotInDataSet
+    case invalidDrawingName
 }
 
 /// Data Method
@@ -1710,6 +1711,8 @@ extension ChartIQView: WKScriptMessageHandler {
                 delegate?.chartIQViewDidReceiveError(self, errorCode: .removeDrawingFailed)
             case -4:
                 delegate?.chartIQViewDidReceiveError(self, errorCode: .drawingNotInDataSet)
+            case -5:
+                delegate?.chartIQViewDidReceiveError(self, errorCode: .invalidDrawingName)
             default:
                 break
             }
