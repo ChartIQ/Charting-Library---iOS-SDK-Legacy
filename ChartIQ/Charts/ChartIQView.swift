@@ -832,7 +832,7 @@ public class ChartIQView: UIView {
     ///
     /// - Parameters:
     ///   - id: The id of the Drawing we want to edit in chart, its the timestamp of the when the drawing was added
-    public func xm_EditDrawing(id: Int) {
+    public func xm_EditDrawing(id: Double) {
         let script = "editDrawing(\(id))";
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
@@ -841,7 +841,7 @@ public class ChartIQView: UIView {
     ///
     /// - Parameters:
     ///   - id: The id of the Drawing we want to edit in chart, its the timestamp of the when the drawing was added
-    public func xm_RemoveDrawing(id: Int) {
+    public func xm_RemoveDrawing(id: Double) {
         let script = "removeDrawing(\(id))";
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
