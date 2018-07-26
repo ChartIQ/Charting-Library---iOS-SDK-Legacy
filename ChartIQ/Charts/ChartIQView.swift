@@ -1088,9 +1088,9 @@ public class ChartIQView: UIView {
     /// - Parameter shouldShow: A boolean value from settings to see if ask price should be shown.
     public func shouldShowAskPrice(shouldShow: Bool) {
         let script = """
-                     shouldDrawAskLineFunction(\(shouldShow));
-                     stxx.draw();
-                     """
+        shouldDrawAskLineFunction(\(shouldShow));
+        stxx.draw();
+        """
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1100,9 +1100,9 @@ public class ChartIQView: UIView {
     ///   Next will redraw the chart so we can see the changes immediately
     public func drawAskLine(askPrice: Double) {
         let script = """
-                     drawAskLine(\(askPrice));
-                     stxx.draw();
-                     """
+        drawAskLine(\(askPrice));
+        stxx.draw();
+        """
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1126,7 +1126,7 @@ public class ChartIQView: UIView {
                             if let name = studyDict["name"] as? String, !name.isEmpty {
                                 studyName = name
                             }
-                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?, type: "")
+                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?, type: "", parameters: studyDict["parameters"] as! [String: Any]?)
                             strongSelf.studyObjects.append(study)
                         }
                     }
@@ -1149,7 +1149,7 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nil if an error occur
     public func getStudyInputParameters(by name: String) -> Any?  {
         addEvent("CHIQ_getStudyInputParameters", parameters: ["studyName": name])
-        let script = "getStudyParameters(\"" + name + "\" , true);"
+        let script = "getStudyParameters(\"" + name + "\" , \"inputs\");"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             let json = try? JSONSerialization.jsonObject(with: data, options: [])
             if let inputs = json as? [[String: Any]] {
@@ -1169,7 +1169,25 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nil if an error occur
     public func getStudyOutputParameters(by name: String) -> Any?  {
         addEvent("CHIQ_getStudyOutputParameters", parameters: ["studyName": name])
-        let script = "getStudyParameters(\"" + name + "\" , false);"
+        let script = "getStudyParameters(\"" + name + "\" , \"outputs\");"
+        if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
+                return json
+            } catch {
+                return nil
+            }
+        }
+        return nil
+    }
+    
+    /// Gets study 'parameters' parameters
+    ///
+    /// - Parameter name: The study name
+    /// - Returns: The JSON Object or nul if an error occur
+    public func getStudyParameters(by name: String) -> Any? {
+        addEvent("CHIQ_getStudyParameters", parameters: ["studyName": name])
+        let script = "getStudyParameters(\"" + name + "\" , \"parameters\");"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: [])
@@ -1275,7 +1293,7 @@ public class ChartIQView: UIView {
         var addedStudy = [Study]()
         let script = "getAddedStudies();"
         if let listString = webView.evaluateJavaScriptWithReturn(script), !listString.isEmpty {
-            let list = listString.components(separatedBy: "||")
+            let list = listString.components(separatedBy: "|||") // changed from two (2) separators to three (3) separators because the join in js file is with three (3) separators, and some studies could not fetch their parameters.
             list.forEach({ (study) in
                 let components = study.components(separatedBy: "___")
                 var name = components[0]
@@ -1287,15 +1305,20 @@ public class ChartIQView: UIView {
                 let inputString = components[1]
                 let outputString = components[2]
                 let typeString = components[3]
+                let parametersString = components[4]
                 var inputs: [String: Any]?
                 var outputs: [String: Any]?
+                var parameters: [String: Any]?
                 if !inputString.isEmpty, let data = inputString.data(using: .utf8) {
                     inputs = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String : Any]?
                 }
                 if !outputString.isEmpty, let data = outputString.data(using: .utf8) {
                     outputs = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
                 }
-                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs, type: typeString)
+                if !parametersString.isEmpty, let data = parametersString.data(using: .utf8) {
+                    parameters = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
+                }
+                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs, type: typeString, parameters: parameters)
                 addedStudy.append(studyObject)
             })
         }

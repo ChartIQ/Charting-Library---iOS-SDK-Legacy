@@ -316,11 +316,12 @@ class ViewController: UIViewController {
         }
         
         // Gets study parameter
-        viewController.getStudyParameterBlock = {[weak self] (study) -> (Any?, Any?) in
-            guard let strongSelf = self else { return (nil, nil)}
+        viewController.getStudyParameterBlock = {[weak self] (study) -> (Any?, Any?, Any?) in
+            guard let strongSelf = self else { return (nil, nil, nil)}
             let input = strongSelf.chartIQView.getStudyInputParameters(by: study)
             let output = strongSelf.chartIQView.getStudyOutputParameters(by: study)
-            return (input, output)
+            let parameters = strongSelf.chartIQView.getStudyParameters(by: study)
+            return (input, output, parameters)
         }
         
         // Edits study parameter
@@ -332,6 +333,9 @@ class ViewController: UIViewController {
             })
             study.outputs?.forEach({ (output) in
                 parameters[output.key] = String(describing: output.value)
+            })
+            study.parameters?.forEach({ (param) in
+                parameters[param.key] = String(describing: param.value)
             })
             strongSelf.chartIQView.setStudy(study.name, parameters: parameters)
         }
