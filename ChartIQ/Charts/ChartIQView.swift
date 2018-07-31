@@ -953,8 +953,17 @@ public class ChartIQView: UIView {
     ///
     /// - Parameters:
     ///   - decimalPlaces: number of decimal places
+    public func xm_setDecimalPlaces(_ decimalPlaces: Int) {
+        let script = "setDecimalPlacesWith(\(decimalPlaces));"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    /// Set decimal places
+    ///
+    /// - Parameters:
+    ///   - decimalPlaces: number of decimal places
     public func setDecimalPlaces(_ decimalPlaces: Int) {
-        let script = "stxx.chart.yAxis.decimalPlaces=\(decimalPlaces)"
+        let script = "stxx.chart.yAxis.decimalPlaces=\(decimalPlaces);"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1293,7 +1302,7 @@ public class ChartIQView: UIView {
         var addedStudy = [Study]()
         let script = "getAddedStudies();"
         if let listString = webView.evaluateJavaScriptWithReturn(script), !listString.isEmpty {
-            let list = listString.components(separatedBy: "|||") // changed from two (2) separators to three (3) separators because the join in js file is with three (3) separators, and some studies could not fetch their parameters.
+            let list = listString.components(separatedBy: "||")
             list.forEach({ (study) in
                 let components = study.components(separatedBy: "___")
                 var name = components[0]
