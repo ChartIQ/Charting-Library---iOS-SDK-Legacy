@@ -953,8 +953,17 @@ public class ChartIQView: UIView {
     ///
     /// - Parameters:
     ///   - decimalPlaces: number of decimal places
-    public func setDecimalPlaces(_ decimalPlaces: Int) {
+    public func xm_setDecimalPlaces(_ decimalPlaces: Int) {
         let script = "setDecimalPlacesWith(\(decimalPlaces));"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    /// Set decimal places
+    ///
+    /// - Parameters:
+    ///   - decimalPlaces: number of decimal places
+    public func setDecimalPlaces(_ decimalPlaces: Int) {
+        let script = "stxx.chart.yAxis.decimalPlaces=\(decimalPlaces);"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
