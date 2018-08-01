@@ -19,7 +19,7 @@ open class Study: NSObject, NSCoding {
     
     public init(shortName: String, name: String, inputs: [String: Any]?, outputs: [String: Any]?, type: String, parameters: [String: Any]?) {
         super.init()
-        self.shortName = shortName
+        self.shortName = shortName.replacingOccurrences(of: "|", with: "")
         self.name = name.replacingOccurrences(of: "|", with: "")
         self.inputs = inputs
         self.outputs = outputs
