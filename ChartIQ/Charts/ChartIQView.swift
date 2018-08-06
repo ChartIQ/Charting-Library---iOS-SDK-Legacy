@@ -858,6 +858,36 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
+    /// Used to show all the hidden Studies from the chart.
+    public func showStudies() {
+        let script = "showStudies()";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    /// Used to hide all the available Studies from the chart.
+    public func hideStudies() {
+        let script = "hideStudies()";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    /// Used to show all the hidden Drawings from the chart.
+    public func showDrawings() {
+        let script = "showDrawings()";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    /// Used to hide all the available Drawings from the chart.
+    public func hideDrawings() {
+        let script = "hideDrawings()";
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    /// Displays or not the chart objects like Drawings and Studies all together.
+    ///
+    /// - Parameters:
+    ///   - show: Boolean value to determine weather to show or not the Study/Drawing objects
+    public func displayChartComponents(_ show: Bool) {
+        let script = "displayChartComponents(\(show))"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Renders a chart for a particular instrument from the data passed in or fetches new data from the attached CIQ.QuoteFeed. This is the method that should be called every time a new chart needs to be drawn for a different instrument.
     ///
     /// - Parameters:
