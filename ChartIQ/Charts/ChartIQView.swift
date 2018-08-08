@@ -833,8 +833,8 @@ public class ChartIQView: UIView {
         let result = webView.evaluateJavaScriptWithReturn(script)
         if let result = result, let data = result.data(using: .utf8) {
             let json = try! JSONSerialization.jsonObject(with: data, options: [])
-            if let dict = json as? [String: String] {
-                return CrosshairHUD(open: dict["open"] ?? "", high: dict["high"] ?? "", low: dict["low"] ?? "", close: dict["close"] ?? "", volume: dict["volume"] ?? "")
+            if let dict = json as? [String: Any] {
+                return CrosshairHUD(open: "\(dict["open"] ?? "")", high: "\(dict["high"] ?? "")", low: "\(dict["low"] ?? "")", close: "\(dict["close"] ?? "")", volume: "\(dict["volume"] ?? "")")
             }
         }
         return nil
