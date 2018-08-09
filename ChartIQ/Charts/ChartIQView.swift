@@ -688,7 +688,7 @@ public class ChartIQView: UIView {
                             if let name = studyDict["name"] as? String, !name.isEmpty {
                                 studyName = name
                             }
-                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?)
+                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?, parameters: studyDict["parameters"] as! [String: Any]?)
                             strongSelf.studyObjects.append(study)
                         }
                     }
@@ -840,15 +840,20 @@ public class ChartIQView: UIView {
                     }
                 let inputString = components[1]
                 let outputString = components[2]
+                let parametersString = components[3]
                 var inputs: [String: Any]?
                 var outputs: [String: Any]?
+                var parameters: [String: Any]?
                 if !inputString.isEmpty, let data = inputString.data(using: .utf8) {
                     inputs = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String : Any]?
                 }
                 if !outputString.isEmpty, let data = outputString.data(using: .utf8) {
                     outputs = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
                 }
-                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs)
+                if !parametersString.isEmpty, let data = parametersString.data(using: .utf8) {
+                    parameters = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
+                }
+                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs, parameters: parameters)
                 addedStudy.append(studyObject)
             })
         }
