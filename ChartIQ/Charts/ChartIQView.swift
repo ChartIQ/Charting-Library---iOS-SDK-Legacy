@@ -669,7 +669,7 @@ public class ChartIQView: UIView {
         case .linebreak: aggregationType = "linebreak"
         case .renko: aggregationType = "renko"
         }
-        let script = "setAggregationType(\"\(chartType)\");"
+        let script = "setAggregationType(\"\(aggregationType)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setAggregationType", parameters: ["aggregationType": aggregationType])
         addEvent("CHIQ_setChartType", parameters: ["chartType": "candle"])
