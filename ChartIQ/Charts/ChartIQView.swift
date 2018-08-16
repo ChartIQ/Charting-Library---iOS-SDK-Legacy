@@ -1385,6 +1385,7 @@ extension ChartIQView: WKScriptMessageHandler {
                     let drawings = try JSONSerialization.jsonObject(with: data, options: [])
                     delegate?.chartIQView?(self, didUpdateDrawing: drawings)
                     addEvent("CHIQ_drawingChange", parameters: ["json": formatObjectToPrintedJSONFormat(drawings)])
+                    disableDrawing()
                 } catch {
                     print("Drawing callback fail")
                 }
