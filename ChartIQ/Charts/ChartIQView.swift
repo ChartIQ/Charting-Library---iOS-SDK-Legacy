@@ -586,7 +586,7 @@ public class ChartIQView: UIView {
         // Create the web view with the configuration
         webView = WKWebView(frame: bounds, configuration: configuration)
         webView.navigationDelegate = self
-        
+        webView.backgroundColor = UIColor(red: 9/255, green: 30/255, blue: 52/255, alpha: 1)
         addSubview(webView)
         setupConstraints()
 
