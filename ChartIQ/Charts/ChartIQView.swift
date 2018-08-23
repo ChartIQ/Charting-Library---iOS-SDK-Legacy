@@ -927,7 +927,7 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nil if an error occur
     public func getStudyInputParameters(by name: String) -> Any?  {
         addEvent("CHIQ_getStudyInputParameters", parameters: ["studyName": name])
-        let script = "getStudyParameters(\"" + name + "\" , \"inputs\");"
+        let script = "getStudyParameters(\"" + name + "\" , true , false);"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             let json = try? JSONSerialization.jsonObject(with: data, options: [])
             if let inputs = json as? [[String: Any]] {
@@ -947,7 +947,7 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nil if an error occur
     public func getStudyOutputParameters(by name: String) -> Any?  {
         addEvent("CHIQ_getStudyOutputParameters", parameters: ["studyName": name])
-        let script = "getStudyParameters(\"" + name + "\" , \"outputs\");"
+        let script = "getStudyParameters(\"" + name + "\" , false , false);"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: [])
@@ -965,7 +965,7 @@ public class ChartIQView: UIView {
     /// - Returns: The JSON Object or nul if an error occur
     public func getStudyParameters(by name: String) -> Any? {
         addEvent("CHIQ_getStudyParameters", parameters: ["studyName": name])
-        let script = "getStudyParameters(\"" + name + "\" , \"parameters\");"
+        let script = "getStudyParameters(\"" + name + "\" , false , true);"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: [])
