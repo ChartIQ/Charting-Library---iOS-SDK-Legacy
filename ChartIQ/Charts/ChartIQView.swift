@@ -1797,36 +1797,9 @@ extension ChartIQView: WKScriptMessageHandler {
 
 extension ChartIQView : WKNavigationDelegate {
     
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        getStudyObjects(completionHandler: { [weak self] in
-            guard let strongSelf = self else {
-                return
-            }
-            strongSelf.loadDefaultSetting()
-            strongSelf.loadingTracker?.studiesLoaded()
-            strongSelf.delegate?.chartIQViewDidFinishLoading(strongSelf)
-        })
-    }
-    
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        loadingTracker?.failed(with: error)
-    }
-    
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         loadingTracker = ChartLoadingTracker()
         loadingTracker?.delegate = self
-    }
-    
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        loadingTracker?.failed(with: error)
-    }
-    
-    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        loadingTracker?.commit()
-    }
-    
-    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate)
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -1841,6 +1814,34 @@ extension ChartIQView : WKNavigationDelegate {
         default:
             decisionHandler(.allow)
         }
+    }
+    
+    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        loadingTracker?.commit()
+    }
+    
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        loadingTracker?.htmlLoaded()
+        getStudyObjects(completionHandler: { [weak self] in
+            guard let strongSelf = self else {
+                return
+            }
+            strongSelf.loadDefaultSetting()
+            strongSelf.loadingTracker?.studiesLoaded()
+            strongSelf.delegate?.chartIQViewDidFinishLoading(strongSelf)
+        })
+    }
+    
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        loadingTracker?.failed(with: error)
+    }
+    
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        loadingTracker?.failed(with: error)
+    }
+    
+    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate)
     }
 }
 
