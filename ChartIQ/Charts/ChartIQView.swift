@@ -10,6 +10,25 @@ import UIKit
 import WebKit
 import CoreTelephony
 
+@objc(ChartIQLoadingDelegate)
+public protocol ChartIQLoadingDelegate {
+    /// Called when the chart has been loaded
+    /// html loaded, studies loaded, candles loaded
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - elapsedTimes: The elapsed times for all loading stages
+    func chartIQView(_ chartView: ChartIQView, didFinishLoadingWithElapsedTimes elapsedTimes: [ChartLoadingElapsedTime])
+    
+    /// Called when the chart failed to load
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - error: The chart loading error
+    ///   - elapsedTimes: The elapsed times for all loading stages up to when the error occurred
+    func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: Error, elapsedTimes: [ChartLoadingElapsedTime])
+}
+
 @objc(ChartIQDataSource)
 public protocol ChartIQDataSource
 {
@@ -211,6 +230,8 @@ public class ChartIQView: UIView {
     
     internal var webView: WKWebView!
     
+    var loadingTracker: ChartLoadingTracker?
+    
     static internal var url = ""
     static internal var refreshInterval = 0
     static internal var voiceoverFields: [String: Bool] = [:]
@@ -267,6 +288,7 @@ public class ChartIQView: UIView {
     weak public var dataSource: ChartIQDataSource?
     
     weak public var delegate: ChartIQDelegate?
+    weak public var loadingDelegate: ChartIQLoadingDelegate?
     
     public var symbol: String {
         return webView.evaluateJavaScriptWithReturn("stxx.chart.symbol") ?? ""
@@ -1781,8 +1803,53 @@ extension ChartIQView : WKNavigationDelegate {
                 return
             }
             strongSelf.loadDefaultSetting()
+            strongSelf.loadingTracker?.studiesLoaded()
             strongSelf.delegate?.chartIQViewDidFinishLoading(strongSelf)
         })
     }
     
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        loadingTracker?.failed(with: error)
+    }
+    
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        loadingTracker = ChartLoadingTracker()
+        loadingTracker?.delegate = self
+    }
+    
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        loadingTracker?.failed(with: error)
+    }
+    
+    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        loadingTracker?.commit()
+    }
+    
+    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate)
+    }
+    
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        guard let statusCode = (navigationResponse.response as? HTTPURLResponse)?.statusCode else {
+            // if there's no http status code to act on, exit and allow navigation
+            decisionHandler(.allow)
+            return
+        }
+        switch statusCode {
+        case 400...:
+            decisionHandler(.cancel)
+        default:
+            decisionHandler(.allow)
+        }
+    }
+}
+
+extension ChartIQView: ChartLoadingTrackingDelegate {
+    func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime]) {
+        loadingDelegate?.chartIQView(self, didFinishLoadingWithElapsedTimes: elapsedTimes)
+    }
+    
+    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime]) {
+        loadingDelegate?.chartIQView(self, didFailLoadingWithError: error, elapsedTimes: elapsedTimes)
+    }
 }
