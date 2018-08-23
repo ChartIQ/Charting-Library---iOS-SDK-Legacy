@@ -110,8 +110,15 @@ public protocol ChartIQDelegate
     ///
     /// - Parameters:
     ///   - chartIQView: The ChartIQView Object
-    ///   - drawing: The Drawing that was removed from the Chart
+    ///   - error: Error Code
     @objc func chartIQViewDidReceiveError(_ chartIQView: ChartIQView, errorCode error: ChartIQErrorHandler)
+    
+    /// Called when Chart failed loading. We can ensure that from 'stx.newChart` callback response, if it produces an error.
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - error: Error message that is produced from loading failure.
+    @objc func chartIQViewDidFailedLoading(_ chartIQView: ChartIQView, errorMessage error: Any)
     
 }
 
@@ -374,6 +381,7 @@ public class ChartIQView: UIView {
         case drawingEdited = "drawingEdited"
         case drawingRemoved = "drawingRemoved"
         case errorHandler = "error"
+        case loadingChartFailed = "loadingChartFailed"
     }
     
     internal static var isValidApiKey = false
@@ -428,6 +436,7 @@ public class ChartIQView: UIView {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingEdited.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingRemoved.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.errorHandler.rawValue)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.loadingChartFailed.rawValue)
         
     }
     
@@ -666,6 +675,7 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.drawingEdited.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.drawingRemoved.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.errorHandler.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.loadingChartFailed.rawValue)
         
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
@@ -1768,6 +1778,10 @@ extension ChartIQView: WKScriptMessageHandler {
                 delegate?.chartIQViewDidReceiveError(self, errorCode: .invalidDrawingName)
             default:
                 break
+            }
+        case .loadingChartFailed:
+            if let errorMessage = message.body as? String {
+                delegate?.chartIQViewDidFailedLoading(self, errorMessage: errorMessage)
             }
         }
     }
