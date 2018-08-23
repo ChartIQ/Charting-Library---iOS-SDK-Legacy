@@ -43,7 +43,7 @@ enum ChartLoadingState {
 public class ChartLoadingElapsedTime: NSObject {
     let from: ChartLoadingState
     let to: ChartLoadingState
-    let time: TimeInterval
+    public let time: TimeInterval
     
     init(from: ChartLoadingState, to: ChartLoadingState, time: TimeInterval) {
         self.from = from
@@ -51,7 +51,7 @@ public class ChartLoadingElapsedTime: NSObject {
         self.time = time
     }
     
-    var step: String {
+    public var step: String {
         return "\(from.name) -> \(to.name)"
     }
 }
