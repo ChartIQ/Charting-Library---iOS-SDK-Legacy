@@ -58,7 +58,7 @@ public class ChartLoadingElapsedTime: NSObject {
 
 
 extension Array where Element == ChartLoadingElapsedTime {
-    var steps: String {
+    public var steps: String {
         return self.map { "\($0.step) \($0.time)" }.joined(separator: "\n")
     }
 }
