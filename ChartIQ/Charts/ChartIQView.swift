@@ -1608,6 +1608,7 @@ extension ChartIQView: WKScriptMessageHandler {
         switch callbackMessage {
         case .newSymbol:
             if let symbol = message.body as? String {
+                loadingTracker?.loaded()
                 delegate?.chartIQView?(self, didUpdateSymbol: symbol)
             }
         case .pullInitialData:
