@@ -62,9 +62,11 @@ extension Array where Element == ChartLoadingElapsedTime {
         return self.map { "\($0.step) \($0.time)" }.joined(separator: "\n")
     }
     
-    public var totalTime: Double = self.reduce(0.0, { (result, elapsedTime) in
-        return result + elapsedTime.time
-    })
+    public var totalTime: Double {
+        return self.reduce(0.0, { (result, elapsedTime) in
+            return result + elapsedTime.time
+        })
+    }
 }
 
 enum ChartLoadingError: Error {
