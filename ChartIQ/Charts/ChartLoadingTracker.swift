@@ -61,17 +61,35 @@ extension Array where Element == ChartLoadingElapsedTime {
     public var steps: String {
         return self.map { "\($0.step) \($0.time)" }.joined(separator: "\n")
     }
+    
+    public var totalTime: Double = self.reduce(0.0, { (result, elapsedTime) in
+        return result + elapsedTime.time
+    })
 }
 
 enum ChartLoadingError: Error {
     case timeout
     case contentProcessDidTerminate
+    case internalError(String)
+}
+
+extension ChartLoadingError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .timeout:
+            return "timeout"
+        case .contentProcessDidTerminate:
+            return "content process terminated"
+        case .internalError(let message):
+            return "internal error \(message)"
+        }
+    }
 }
 
 class ChartLoadingTracker {
     weak var delegate: ChartLoadingTrackingDelegate?
     
-    var elapsedTimes: [ChartLoadingElapsedTime] = []
+    private var elapsedTimes: [ChartLoadingElapsedTime] = []
     private var finished = false
     
     private var state: ChartLoadingState {
