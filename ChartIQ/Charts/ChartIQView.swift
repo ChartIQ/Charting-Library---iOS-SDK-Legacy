@@ -85,10 +85,19 @@ public protocol ChartIQDelegate
     ///   - drawings: The drawing objects in JSON format
     @objc optional func chartIQView(_ chartIQView: ChartIQView, didUpdateDrawing drawings: Any)
     
-    /// Called when Javascript produces an error -XM
-    @objc func didReceiveJavascriptError(with message: String)
+    /// Called when javascript produces a log type (log, error, warn)
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - type: The type of log that comes from JS (log, error, warn)
+    ///   - message: The actual string message that comes from JS
+    @objc func chartIQView(_ chartIQView: ChartIQView, didReceiveProxyLogging type: ChartIQProxyLoggerType, message: String)
     
     /// Called when a user deletes a Study from the ChartIQ
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    ///   - name: The name of the study that is deleted
     @objc func chartIQView(_ chartIQView: ChartIQView, didDeleteStudy name: String)
     
     /// Called when a user taps on the screen and we receive a callback from JS that the user tapped the chart from an inactive area. Definition of Active Area: Crosshair enabled, Drawing on highlight/edit mode.
@@ -142,6 +151,14 @@ public enum ChartIQErrorHandler: Int {
     case removeDrawingFailed
     case drawingNotInDataSet
     case invalidDrawingName
+}
+
+/// Data Method
+@objc
+public enum ChartIQProxyLoggerType: Int {
+    case log
+    case logWarn
+    case logError
 }
 
 /// Data Method
@@ -1743,7 +1760,11 @@ extension ChartIQView: WKScriptMessageHandler {
             NSLog("%@: %@", method, msg)
             print("\(method) \(msg)")
             if method == "ERROR" {
-                delegate?.didReceiveJavascriptError(with: msg)
+                delegate?.chartIQView(self, didReceiveProxyLogging: .logError, message: msg)
+            } else if method == "WARN" {
+                delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: msg)
+            } else {
+                delegate?.chartIQView(self, didReceiveProxyLogging: .log, message: msg)
             }
         case .deletedStudy:
             guard let message = message.body as? [String: Any],
