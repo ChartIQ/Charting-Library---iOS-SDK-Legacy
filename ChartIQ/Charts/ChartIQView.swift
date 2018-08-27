@@ -1817,7 +1817,7 @@ extension ChartIQView: WKScriptMessageHandler {
             }
         case .loadingChartFailed:
             if let errorMessage = message.body as? String {
-                loadingTracker?.failed(with: ChartLoadingError.chartFailedLoading(errorMessage))
+                loadingTracker?.failed(with: ChartLoadingError.internalError(errorMessage))
             }
         }
     }
