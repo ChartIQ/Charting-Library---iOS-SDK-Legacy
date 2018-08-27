@@ -140,14 +140,6 @@ public protocol ChartIQDelegate
     ///   - chartIQView: The ChartIQView Object
     ///   - error: Error Code
     @objc func chartIQViewDidReceiveError(_ chartIQView: ChartIQView, errorCode error: ChartIQErrorHandler)
-    
-    /// Called when Chart failed loading. We can ensure that from 'stx.newChart` callback response, if it produces an error.
-    ///
-    /// - Parameters:
-    ///   - chartIQView: The ChartIQView Object
-    ///   - error: Error message that is produced from loading failure.
-    @objc func chartIQViewDidFailedLoading(_ chartIQView: ChartIQView, errorMessage error: Any)
-    
 }
 
 /// ChartIQ Custom XM Error Handler
@@ -1825,7 +1817,7 @@ extension ChartIQView: WKScriptMessageHandler {
             }
         case .loadingChartFailed:
             if let errorMessage = message.body as? String {
-                delegate?.chartIQViewDidFailedLoading(self, errorMessage: errorMessage)
+                loadingTracker?.failed(with: ChartLoadingError.chartFailedLoading(errorMessage))
             }
         }
     }

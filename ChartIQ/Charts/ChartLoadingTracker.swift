@@ -73,6 +73,7 @@ enum ChartLoadingError: Error {
     case timeout
     case contentProcessDidTerminate
     case internalError(String)
+    case chartFailedLoading(String)
 }
 
 extension ChartLoadingError: LocalizedError {
@@ -83,6 +84,8 @@ extension ChartLoadingError: LocalizedError {
         case .contentProcessDidTerminate:
             return "content process terminated"
         case .internalError(let message):
+            return "internal error \(message)"
+        case .chartFailedLoading(let message):
             return "internal error \(message)"
         }
     }
