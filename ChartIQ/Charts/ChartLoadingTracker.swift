@@ -10,7 +10,7 @@ import Foundation
 
 protocol ChartLoadingTrackingDelegate: class {
     func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime])
-    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime])
+    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
 
@@ -148,9 +148,9 @@ class ChartLoadingTracker {
         delegate?.chartDidFinishLoading(elapsedTimes: elapsedTimes)
     }
     
-    func failed(with error: Error) {
+    func failed(with error: Error, for url: String) {
         state = .failed(error)
-        delegate?.chartDidFailLoadingWithError(error, elapsedTimes: elapsedTimes)
+        delegate?.chartDidFailLoadingWithError(error, elapsedTimes: elapsedTimes, for: url)
     }
     
 }

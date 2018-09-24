@@ -26,7 +26,7 @@ public protocol ChartIQLoadingDelegate {
     ///   - chartIQView: The ChartIQView Object
     ///   - error: The chart loading error
     ///   - elapsedTimes: The elapsed times for all loading stages up to when the error occurred
-    func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: Error, elapsedTimes: [ChartLoadingElapsedTime])
+    func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
 @objc(ChartIQDataSource)
@@ -252,7 +252,7 @@ public class ChartIQView: UIView {
     static internal var refreshInterval = 0
     static internal var voiceoverFields: [String: Bool] = [:]
     
-    public static var chartIQUrl: String {
+    public var chartIQUrl: String {
         return ChartIQView.url
     }
     
@@ -1817,7 +1817,7 @@ extension ChartIQView: WKScriptMessageHandler {
             }
         case .loadingChartFailed:
             if let errorMessage = message.body as? String {
-                loadingTracker?.failed(with: ChartLoadingError.internalError(errorMessage))
+                loadingTracker?.failed(with: ChartLoadingError.internalError(errorMessage), for: chartIQUrl)
             }
         }
     }
@@ -1861,24 +1861,24 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        loadingTracker?.failed(with: error)
+        loadingTracker?.failed(with: error, for: chartIQUrl)
     }
     
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        loadingTracker?.failed(with: error)
+        loadingTracker?.failed(with: error, for: chartIQUrl)
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate)
+        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate, for: chartIQUrl)
     }
 }
 
 extension ChartIQView: ChartLoadingTrackingDelegate {
-    func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime]) {
+func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime]) {
         loadingDelegate?.chartIQView(self, didFinishLoadingWithElapsedTimes: elapsedTimes)
     }
     
-    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime]) {
-        loadingDelegate?.chartIQView(self, didFailLoadingWithError: error, elapsedTimes: elapsedTimes)
+    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String) {
+        loadingDelegate?.chartIQView(self, didFailLoadingWithError: error, elapsedTimes: elapsedTimes, for: url)
     }
 }
