@@ -26,6 +26,7 @@ public protocol ChartIQLoadingDelegate {
     ///   - chartIQView: The ChartIQView Object
     ///   - error: The chart loading error
     ///   - elapsedTimes: The elapsed times for all loading stages up to when the error occurred
+    ///   - url: The URL String that will load the chart
     func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
