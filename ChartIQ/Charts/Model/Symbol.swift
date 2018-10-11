@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class Symbol: NSObject {
+open class Symbol: NSObject,Codable {
     
     open var symbol = ""
     open var name = ""
