@@ -12,12 +12,17 @@ open class Symbol: NSObject {
     
     open var symbol = ""
     open var name = ""
+    open var isCurrency = false
+    open var segment = ""
     
-    public init(symbol: String, name: String) {
+    public init(symbol: String, name: String,isCurrency: Bool,segment: String) {
         super.init()
         
         self.symbol = symbol
         self.name = name
+        self.isCurrency = isCurrency
+        self.segment = segment
     }
     
 }
+
