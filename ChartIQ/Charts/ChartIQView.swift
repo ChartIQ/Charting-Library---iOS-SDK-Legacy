@@ -710,8 +710,12 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - object: The symbol object for the new chart
     public func setSymbolObject(_ object: Symbol) {
+        let jsonEncoder = JSONEncoder()
+        let jsonData = try! jsonEncoder.encode(object)
+        var jsonString = String(data: jsonData, encoding: .utf8)
+        jsonString = jsonString?.replacingOccurrences(of: "\"", with: "\'")
         let script =
-            "stxx.newChart(\"\(symbol)\", \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\"\(symbol)\"); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); "
+        "stxx.newChart(\(jsonString!), \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\(jsonString!)); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setSymbolObject", parameters: ["symbolObject.symbol": object.symbol])
     }
