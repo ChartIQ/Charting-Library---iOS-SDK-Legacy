@@ -1308,7 +1308,6 @@ public class ChartIQView: UIView {
     fileprivate func formatObjectToPrintedJSONFormat(_ object: Any) -> String {
         let jsonData = try! JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)
-        print(jsonString!)
         return jsonString ?? ""
     }
     
