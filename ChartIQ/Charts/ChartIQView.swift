@@ -295,8 +295,6 @@ public class ChartIQView: UIView {
         case log = "logHandler"
     }
     
-    internal static var isValidApiKey = false
-    
     internal static let serverError = NSError(domain:"Server error.", code:0, userInfo:nil)
     
     internal static var carrierName: String {
@@ -367,8 +365,6 @@ public class ChartIQView: UIView {
     
     /// setup WKWebView
     internal func setupWebView() {
-        guard ChartIQView.isValidApiKey else { return }
-        
         // Create the user content controller and add the script to it
         let userContentController = WKUserContentController()
         
