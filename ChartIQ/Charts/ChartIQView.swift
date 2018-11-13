@@ -389,7 +389,9 @@ public class ChartIQView: UIView {
         webView.navigationDelegate = self
         
         addSubview(webView)
-        setupConstraints()
+        if #available(iOS 9, *) {
+            setupConstraints()
+        }
 
         if let url = URL(string: ChartIQView.chartIQUrl) {
             webView.load(URLRequest(url: url))
@@ -397,6 +399,7 @@ public class ChartIQView: UIView {
     }
     
     /// Setup constraints
+    @available(iOS 9, *)
     internal func setupConstraints() {
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.leadingAnchor.constraint(
@@ -466,7 +469,7 @@ public class ChartIQView: UIView {
         case .linebreak: aggregationType = "linebreak"
         case .renko: aggregationType = "renko"
         }
-        let script = "setAggregationType(\"\(chartType)\");"
+        let script = "setAggregationType(\"\(aggregationType)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -923,7 +926,7 @@ public class ChartIQView: UIView {
     
     /// Gets the input parameters for a drawing
     public func getDrawingParameters() -> Any? {
-        if let tool = getCurrentDrawTool() {
+        if getCurrentDrawTool() != nil {
         }
         let script = "JSON.stringify(stxx.currentVectorParameters);"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
