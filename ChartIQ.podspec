@@ -13,8 +13,8 @@ Pod::Spec.new do |s|
   s.author           = { 'jacob' => 'jacob@chartiq.com' }
   s.source           = { :git => 'https://github.com/ChartIQ/Charting-Library---iOS-SDK.git', :branch => 'podspec-linting' }
 
+  s.platform = :ios, '9.0'
   s.ios.deployment_target = '9.0'
-  s.platform = 'ios'
   s.source_files = 'ChartIQ/Extension/*', 'ChartIQ/Charts/**/*', 'ChartIQ/Charts/*', 'ChartIQ/Supporting Files/*'
   s.exclude_files = "ChartIQ/**/*.plist"
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3' }
