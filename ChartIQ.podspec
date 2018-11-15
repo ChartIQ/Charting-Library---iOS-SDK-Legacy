@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ChartIQ'
-  s.version          = '2.0.3-beta'
+  s.version          = '2.0.3'
   s.swift_version    = '3'
   s.summary          = 'ChartIQ'
 
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/ChartIQ/Charting-Library---iOS-SDK'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'jacob' => 'jacob@chartiq.com' }
-  s.source           = { :git => 'https://github.com/ChartIQ/Charting-Library---iOS-SDK.git', :branch => 'podspec-linting' }
+  s.source           = { :git => 'https://github.com/ChartIQ/Charting-Library---iOS-SDK.git', :tag => s.version.to_s }
 
   s.platform = :ios, '9.0'
   s.ios.deployment_target = '9.0'
