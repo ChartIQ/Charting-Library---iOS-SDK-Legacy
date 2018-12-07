@@ -147,7 +147,22 @@ public enum ChartIQDrawingTool: Int {
 
 /// Chart that draw ChartIQ chart.
 public class ChartIQView: UIView {
-
+    
+    var excludedStudies = [
+        "correl": true,
+        "Directional": true,
+        "GAPO":true,
+        "vchart":true,
+        "vol undr":true,
+        // Temporarily removed as require comparison symbol to work TODO: Check after enabling compare in chart
+        "Perf Idx": true,
+        "Beta": true,
+        // Temporarily removed as not working on our chart. TODO: Check with chartiq team for fix
+        "Weighted Close": true,
+        "Typical Price": true,
+        "Med Price": true,
+        "P Rel": true
+    ]
     // MARK: - Properties
     
     internal var webView: WKWebView!
@@ -340,7 +355,7 @@ public class ChartIQView: UIView {
     }
     
     /// Cleans up the message handlers in order to avoid a memory leak.
-    /// Should be called when the view is about to get deallocated (e.g. the deinit of its superview)    
+    /// Should be called when the view is about to get deallocated (e.g. the deinit of its superview)
     public func cleanup() {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.accessibility.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.newSymbol.rawValue)
@@ -434,7 +449,7 @@ public class ChartIQView: UIView {
                        "X-ROKO-Mobi-Application-Version": Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String,
                        "X-ROKO-Mobi-Timezone": TimeZone.current.identifier,
                        "X-ROKO-Mobi-Network-Type": "WiFi"
-                        ]
+        ]
         
         if !ChartIQView.rokoMobiAuthorizaion.isEmpty {
             headers["Authorization"] = ChartIQView.rokoMobiAuthorizaion
@@ -448,7 +463,7 @@ public class ChartIQView: UIView {
         request.httpMethod = "POST"
         let parameter = ["applicationSessionUUID": UIDevice.current.identifierForVendor!.uuidString,
                          "events": [["name": "_ChartIQ.SDK.Init", "properties": ["ChartIQ SDK Version": sdkVersion]]]
-                    ] as [String : Any]
+            ] as [String : Any]
         request.httpBody = try! JSONSerialization.data(withJSONObject: parameter, options: [])
         let response = URLSession.shared.synchronousDataTask(with: request)
         guard let data = response.0 else { throw ROKOMobiError.serverError }
@@ -578,7 +593,7 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.layout.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.drawing.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.log.rawValue)
-
+        
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = userContentController
@@ -589,7 +604,7 @@ public class ChartIQView: UIView {
         webView.backgroundColor = UIColor(red: 9/255, green: 30/255, blue: 52/255, alpha: 1)
         addSubview(webView)
         setupConstraints()
-
+        
         if let url = URL(string: ChartIQView.chartIQUrl) {
             webView.load(URLRequest(url: url))
             addEvent("_ROKO.Active User")
@@ -715,10 +730,12 @@ public class ChartIQView: UIView {
         var jsonString = String(data: jsonData, encoding: .utf8)
         jsonString = jsonString?.replacingOccurrences(of: "\"", with: "\'")
         let script =
-        "stxx.newChart(\(jsonString!), \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\(jsonString!)); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); "
+        "insertChartData(\(jsonString!), \(dataMethod == .pull ? "null" : "[]"), null, \(dataMethod == .pull ? "function() { webkit.messageHandlers.newSymbolCallbackHandler.postMessage(\(jsonString!)); } " : "null"),  {periodicity:{period:\(periodicity),interval:\(jsInterval)}}); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setSymbolObject", parameters: ["symbolObject.symbol": object.symbol])
     }
+    
+    
     
     /// Adds a symbol comparison to the chart.
     ///
@@ -727,7 +744,7 @@ public class ChartIQView: UIView {
     ///   - color: Color to draw line
     public func addComparisonSymbol(_ symbol: String, color: UIColor = UIColor.red) {
         let addSeriesScript = "stxx.addSeries(\"\(symbol)\", {display:\"\(symbol)\", color: \"\(color.toHexString())\"  isComparison:true});"
-
+        
         webView.evaluateJavaScript(addSeriesScript, completionHandler: nil)
         addEvent("CHIQ_addComparison", parameters: ["symbol": symbol])
     }
@@ -831,7 +848,7 @@ public class ChartIQView: UIView {
         return webView.evaluateJavaScriptWithReturn(script) == "true"
     }
     
-    /// Gets crosshair highlighted price data for HUD 
+    /// Gets crosshair highlighted price data for HUD
     public func getCrosshairsHUDDetail() -> CrosshairHUD? {
         let script = "getHudDetails();"
         let result = webView.evaluateJavaScriptWithReturn(script)
@@ -875,7 +892,7 @@ public class ChartIQView: UIView {
         let jsonData = try! JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)
         let script =
-            "callNewChart(\"\", \(jsonString!)); "
+        "callNewChart(\"\", \(jsonString!)); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_pushInitialData", parameters: ["symbol": symbol, "data": jsonString!])
     }
@@ -904,6 +921,9 @@ public class ChartIQView: UIView {
                 let json = try! JSONSerialization.jsonObject(with: data, options: [])
                 if let dict = json as? [String: Any] {
                     for key in dict.keys {
+                        if(strongSelf.excludedStudies[key] ?? false) {
+                            continue
+                        }
                         if let studyDict = dict[key] as? [String: Any] {
                             var studyName = key
                             if let name = studyDict["name"] as? String, !name.isEmpty {
@@ -1003,8 +1023,8 @@ public class ChartIQView: UIView {
             "var helper = new CIQ.Studies.DialogHelper({sd:selectedSd,stx:stxx}); " +
             "var isFound = false; " +
             "var newInputParameters = {}; " +
-            "var newOutputParameters = {}; "
-    
+        "var newOutputParameters = {}; "
+        
         parameters.forEach { (parameter) in
             script += getUpdateStudyParametersScript(parameter: parameter.key, value: parameter.value)
             addEvent("CHIQ_setStudyParameter", parameters: ["parameter": parameter.key, "value": parameter.value])
@@ -1047,7 +1067,7 @@ public class ChartIQView: UIView {
         }
         
         let script = "addStudy('\(name)', \(_inputs!), \(_outputs!));"
-        webView.evaluateJavaScript(script, completionHandler: nil)        
+        webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_addStudy", parameters: ["studyName": name])
     }
     
@@ -1083,7 +1103,7 @@ public class ChartIQView: UIView {
                 if name.contains("|\u{200c}") {
                     name.remove(at: name.startIndex)
                     name.insert("\u{200c}", at: name.startIndex)
-                    }
+                }
                 let inputString = components[1]
                 let outputString = components[2]
                 let parametersString = components[3]
@@ -1118,7 +1138,7 @@ public class ChartIQView: UIView {
         }
         return nil
     }
-
+    
     /// Gets draw tool name
     internal func getDrawToolName(for tool: ChartIQDrawingTool) -> String {
         switch tool {
@@ -1167,7 +1187,7 @@ public class ChartIQView: UIView {
     public func enableDrawing(with tool: ChartIQDrawingTool) {
         let script =
             "currentDrawing = \"\(getDrawToolName(for: tool))\"; " +
-            "stxx.changeVectorType(currentDrawing); "
+        "stxx.changeVectorType(currentDrawing); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_enableDrawing")
     }
@@ -1191,7 +1211,7 @@ public class ChartIQView: UIView {
     ///   - value: The value
     public func setDrawing(withParameter key: String, value: Any) {
         let script =
-            "stxx.currentVectorParameters.\(key) = \(value is String ? "\"\(value)\"" : value); "
+        "stxx.currentVectorParameters.\(key) = \(value is String ? "\"\(value)\"" : value); "
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_setDrawingParameter", parameters: ["parameter": key, "value": String(describing: value)])
     }
@@ -1199,7 +1219,7 @@ public class ChartIQView: UIView {
     /// Disables drawing on the chart.
     public func disableDrawing() {
         let script = "stxx.changeVectorType(null); " +
-            "currentDrawing = \"\" ; "
+        "currentDrawing = \"\" ; "
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1216,7 +1236,7 @@ public class ChartIQView: UIView {
         let script = "stxx.\(functionName)(\(json));"
         let value = webView.evaluateJavaScriptWithReturn(script)
         var result = ""
-
+        
         if value != nil {
             result = unwrapOptional(any: value as Any) as! String
         }
@@ -1251,27 +1271,27 @@ public class ChartIQView: UIView {
     fileprivate func getUpdateStudyParametersScript(parameter: String, value: String) -> String{
         let updateParametersScript =
             "for (x in helper.inputs) {" +
-            "   var input = helper.inputs[x]; " +
-            "   if (input[\"name\"] === \"\(parameter)\") { " +
-            "       isFound = true; " +
-            "       if (input[\"type\"] === \"text\" || input[\"type\"] === \"select\") { " +
-            "           newInputParameters[\"\(parameter)\"] = \"\(value)\"; " +
-            "       } else if (input[\"type\"] === \"number\") { " +
-            "           newInputParameters[\"\(parameter)\"] = parseInt(\"\(value)\"); " +
-            "       } else if (input[\"type\"] === \"checkbox\") { " +
-            "           newInputParameters[\"\(parameter)\"] = \(value == "false" ? false : true); " +
-            "       } " +
-            "   } " +
-            "} " +
-            "if (isFound == false) { " +
-            "   for (x in helper.outputs) { " +
-            "       var output = helper.outputs[x]; " +
-            "       if (output[\"name\"] === \"\(parameter)\") { " +
-            "           newOutputParameters[\"\(parameter)\"] = \"\(value)\"; " +
-            "       } " +
-            "   } " +
-            "} " +
-            "isFound = false;"
+                "   var input = helper.inputs[x]; " +
+                "   if (input[\"name\"] === \"\(parameter)\") { " +
+                "       isFound = true; " +
+                "       if (input[\"type\"] === \"text\" || input[\"type\"] === \"select\") { " +
+                "           newInputParameters[\"\(parameter)\"] = \"\(value)\"; " +
+                "       } else if (input[\"type\"] === \"number\") { " +
+                "           newInputParameters[\"\(parameter)\"] = parseInt(\"\(value)\"); " +
+                "       } else if (input[\"type\"] === \"checkbox\") { " +
+                "           newInputParameters[\"\(parameter)\"] = \(value == "false" ? false : true); " +
+                "       } " +
+                "   } " +
+                "} " +
+                "if (isFound == false) { " +
+                "   for (x in helper.outputs) { " +
+                "       var output = helper.outputs[x]; " +
+                "       if (output[\"name\"] === \"\(parameter)\") { " +
+                "           newOutputParameters[\"\(parameter)\"] = \"\(value)\"; " +
+                "       } " +
+                "   } " +
+                "} " +
+        "isFound = false;"
         return updateParametersScript
     }
     
@@ -1282,10 +1302,10 @@ public class ChartIQView: UIView {
     fileprivate func getStudyDescriptorScript(with name: String) -> String{
         let script =
             "var s=stxx.layout.studies; " +
-            "var selectedSd = {}; " +
-            "for(var n in s){ " +
-            "   var sd=s[n]; " +
-            "if (sd.name === \"\(name)\") { selectedSd = sd; }} "
+                "var selectedSd = {}; " +
+                "for(var n in s){ " +
+                "   var sd=s[n]; " +
+        "if (sd.name === \"\(name)\") { selectedSd = sd; }} "
         return script
     }
     
@@ -1396,7 +1416,7 @@ extension ChartIQView: WKScriptMessageHandler {
         case .accessibility:
             if let quote = message.body as? String {
                 let fieldsArray = quote.components(separatedBy: "||")
-
+                
                 if fieldsArray.count == 6 {
                     let date = fieldsArray[0]
                     let close = fieldsArray[1]
@@ -1406,7 +1426,7 @@ extension ChartIQView: WKScriptMessageHandler {
                     let volume = fieldsArray[5]
                     
                     // the below is very clunky, find a better way in the future
-                    // maybe first idea of passing in fields to library instead 
+                    // maybe first idea of passing in fields to library instead
                     // of getting everything back
                     var selectedFields = ""
                     
@@ -1441,8 +1461,8 @@ extension ChartIQView: WKScriptMessageHandler {
                 }
             }
         case .log:
-        // Allows for various console messages from JavaScript to show up in Xcode console.
-        // Accepted console methods are "log," "warning," and "error".
+            // Allows for various console messages from JavaScript to show up in Xcode console.
+            // Accepted console methods are "log," "warning," and "error".
             let message = message.body as! [String: Any]
             let method = message["method"] as? String ?? "LOG"
             let arguments = message["arguments"] as! [String: String]
@@ -1451,7 +1471,7 @@ extension ChartIQView: WKScriptMessageHandler {
                 if (msg.count > 0) {
                     msg += "\n"
                 }
-
+                
                 msg += value
             }
             NSLog("%@: %@", method, msg)
@@ -1460,11 +1480,12 @@ extension ChartIQView: WKScriptMessageHandler {
 }
 
 extension ChartIQView : WKNavigationDelegate {
-
+    
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         getStudyObjects()
         loadDefaultSetting()
         delegate?.chartIQViewDidFinishLoading(self)
     }
-
+    
 }
+
