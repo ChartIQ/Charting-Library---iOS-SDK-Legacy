@@ -13,8 +13,8 @@ import ChartIQ
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let url = "http://192.168.1.31:8080/3.0.0/default/template-basic.html"
-    let apiKey = "ZCeXudvZdX2xpAXv1XrRbc41EcMWk9lEsixYw8vNXUc="
+    let url = "http://yourdeployment/sample-template-native-sdk.html"
+    let apiKey = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

@@ -14,7 +14,6 @@ class ViewController: UIViewController {
     // MARK: - Properties
     
     @IBOutlet weak var chartIQView: ChartIQView!
-    @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     @IBOutlet weak var periodMenuView: UIView!
     @IBOutlet weak var periodTableView: UITableView!
     @IBOutlet weak var crosshairHUDView: UIView!
@@ -91,7 +90,13 @@ class ViewController: UIViewController {
             setupSearchStudiesController(viewController)
         }
     }
-    
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: nil, completion: { context in
+            self.chartIQView.resizeChart()
+        })
+    }
+
     // MARK: - Layout
     
     func setupNavigationBar() {
@@ -236,7 +241,6 @@ class ViewController: UIViewController {
         // Sets chartIQ url
         viewController.urlDidChangeBlock = {[weak self] (url) in
             guard let strongSelf = self else { return }
-            strongSelf.activityIndicatorView.startAnimating()
             strongSelf.chartIQView.setChartIQUrl(url)
         }
     }
@@ -312,11 +316,12 @@ class ViewController: UIViewController {
         }
         
         // Gets study parameter
-        viewController.getStudyParameterBlock = {[weak self] (study) -> (Any?, Any?) in
-            guard let strongSelf = self else { return (nil, nil)}
+        viewController.getStudyParameterBlock = {[weak self] (study) -> (Any?, Any?, Any?) in
+            guard let strongSelf = self else { return (nil, nil, nil)}
             let input = strongSelf.chartIQView.getStudyInputParameters(by: study)
             let output = strongSelf.chartIQView.getStudyOutputParameters(by: study)
-            return (input, output)
+            let parameters = strongSelf.chartIQView.getStudyParameters(by: study)
+            return (input, output, parameters)
         }
         
         // Edits study parameter
@@ -328,6 +333,9 @@ class ViewController: UIViewController {
             })
             study.outputs?.forEach({ (output) in
                 parameters[output.key] = String(describing: output.value)
+            })
+            study.parameters?.forEach({ (param) in
+                parameters[param.key] = String(describing: param.value)
             })
             strongSelf.chartIQView.setStudy(study.name, parameters: parameters)
         }
@@ -341,7 +349,6 @@ class ViewController: UIViewController {
 
     
     func loadChartInitialData(symbol: String, period: Int, interval: String, completionHandler: @escaping ([ChartIQData]) -> Void) {
-        activityIndicatorView.startAnimating()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.sss'Z'"
         let endDate = dateFormatter.string(from: Date())
@@ -350,8 +357,7 @@ class ViewController: UIViewController {
         let _period = isMinute ? Int(interval)! : period
         let params = ChartIQQuoteFeedParams(symbol: symbol, startDate: "2016-12-16T16:00:00.000Z", endDate: endDate, interval: _interval, period: _period)
         loadChartData(by: params, completionHandler: {[weak self] (data) in
-            guard let strongSelf = self else { return }
-            DispatchQueue.main.async { strongSelf.activityIndicatorView.stopAnimating() }
+            guard self != nil else { return }
             completionHandler(data)
         })
     }
@@ -387,14 +393,17 @@ class ViewController: UIViewController {
     
     // MARK: - Data
     
+    let uuid = UUID().uuidString;
+    
     func loadChartData(by params: ChartIQQuoteFeedParams, completionHandler: @escaping ([ChartIQData]) -> Void) {
         let urlString =
             "http://simulator.chartiq.com/datafeed?identifier=\(params.symbol)" +
-            "&startdate=\(params.startDate)" +
-            "\(params.endDate.isEmpty ? "" : "&enddate=\(params.endDate)")" +
-            "&interval=\(params.interval)" +
-            "&period=\(params.period)" +
-            "&seed=1001"
+                "&startdate=\(params.startDate)" +
+                "\(params.endDate.isEmpty ? "" : "&enddate=\(params.endDate)")" +
+                "&interval=\(params.interval)" +
+                "&period=\(params.period)" +
+                "&extended=1" +
+                "&session=\(uuid)"
         guard let url = URL(string: urlString) else { return }
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let strongSelf = self else { return }
@@ -609,15 +618,12 @@ extension ViewController: ChartIQDelegate {
     }
     
     func chartIQView(_ chartIQView: ChartIQView, didUpdateLayout layout: Any) {
-        activityIndicatorView.stopAnimating()
     }
     
     func chartIQView(_ chartIQView: ChartIQView, didUpdateSymbol symbol: String) {
-        activityIndicatorView.stopAnimating()
     }
     
     func chartIQView(_ chartIQView: ChartIQView, didUpdateDrawing drawings: Any) {
-        activityIndicatorView.stopAnimating()
     }
     
 }
