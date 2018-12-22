@@ -326,7 +326,7 @@ public class ChartIQView: UIView {
     
     internal static var rokoMobiAuthorizaion = ""
     
-    internal static var disableAnalytics = false
+    internal static var disableAnalytics = true
     
     internal static let serverError = NSError(domain:"Server error.", code:0, userInfo:nil)
     
@@ -601,7 +601,8 @@ public class ChartIQView: UIView {
         // Create the web view with the configuration
         webView = WKWebView(frame: bounds, configuration: configuration)
         webView.navigationDelegate = self
-        webView.backgroundColor = UIColor(red: 9/255, green: 30/255, blue: 52/255, alpha: 1)
+        webView.backgroundColor = UIColor.clear
+        webView.scrollView.backgroundColor = UIColor.clear
         addSubview(webView)
         setupConstraints()
         
@@ -880,6 +881,11 @@ public class ChartIQView: UIView {
         addEvent("CHIQ_clearChart")
     }
     
+    public func restoreLayout() {
+        let script = "restoreLayout();"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     // MARK: - Set Chart data
     
     /// Sets the chart data by push.
@@ -904,9 +910,9 @@ public class ChartIQView: UIView {
         let obj = data.map{ $0.toDictionary() }
         let jsonData = try! JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
-        let script = "parseData('\(jsonString)');"
+        let script = "appendData('\(jsonString)');"
         webView.evaluateJavaScript(script, completionHandler: nil)
-        addEvent("CHIQ_pushUpdate", parameters: ["symbol": symbol, "data": jsonString])
+        //addEvent("CHIQ_pushUpdate", parameters: ["symbol": symbol, "data": jsonString])
     }
     
     // MARK: - Study
@@ -1488,4 +1494,5 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
 }
+
 
