@@ -1409,14 +1409,8 @@ extension ChartIQView: WKScriptMessageHandler {
             }
         case .drawing:
             if let message = message.body as? String, let data = message.data(using: .utf8) {
-                do {
-                    let drawings = try JSONSerialization.jsonObject(with: data, options: [])
-                    delegate?.chartIQView?(self, didUpdateDrawing: drawings)
-                    addEvent("CHIQ_drawingChange", parameters: ["json": formatObjectToPrintedJSONFormat(drawings)])
-                    disableDrawing()
-                } catch {
-                    print("Drawing callback fail")
-                }
+                delegate?.chartIQView?(self, didUpdateDrawing: message)
+                disableDrawing()
             }
         case .accessibility:
             if let quote = message.body as? String {
@@ -1493,5 +1487,6 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
 }
+
 
 
