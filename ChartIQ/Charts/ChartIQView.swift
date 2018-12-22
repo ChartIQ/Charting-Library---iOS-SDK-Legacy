@@ -881,8 +881,13 @@ public class ChartIQView: UIView {
         addEvent("CHIQ_clearChart")
     }
     
-    public func restoreLayout() {
-        let script = "restoreLayout();"
+    public func restoreLayout(layout: String) {
+        let script = "restoreLayout(\(layout));"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    public func restoreDrawings(drawings: String) {
+        let script = "restoreDrawings(\(drawings));"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -1399,14 +1404,8 @@ extension ChartIQView: WKScriptMessageHandler {
             })
             addEvent("CHIQ_pullPagination", parameters: ["symbol": symbol, "interval": String(period), "timeUnit": interval, "end": endDate])
         case .layout:
-            if let message = message.body as? String, let data = message.data(using: .utf8) {
-                do {
-                    let layout = try JSONSerialization.jsonObject(with: data, options: [])
-                    delegate?.chartIQView?(self, didUpdateLayout: layout)
-                    addEvent("CHIQ_layoutChange", parameters: ["json": formatObjectToPrintedJSONFormat(layout)])
-                } catch {
-                    print("No Layout return")
-                }
+            if let message = message.body as? String {
+                delegate?.chartIQView?(self, didUpdateLayout: message)
             }
         case .drawing:
             if let message = message.body as? String, let data = message.data(using: .utf8) {
