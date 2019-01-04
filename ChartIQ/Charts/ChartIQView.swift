@@ -307,6 +307,10 @@ public class ChartIQView: UIView {
     weak public var delegate: ChartIQDelegate?
     weak public var loadingDelegate: ChartIQLoadingDelegate?
     
+    public var isWebViewLoading: Bool {
+        return webView.isLoading
+    }
+    
     public var symbol: String {
         return webView.evaluateJavaScriptWithReturn("stxx.chart.symbol") ?? ""
     }
