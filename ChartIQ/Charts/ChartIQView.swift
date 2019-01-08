@@ -1884,7 +1884,10 @@ extension ChartIQView : WKNavigationDelegate {
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         webView.reload() //https://trac.webkit.org/changeset/232668/webkit
-        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate, for: chartIQUrl)
+        guard let warningMessage = ChartLoadingError.contentProcessDidTerminate.errorDescription else {
+            return
+        }
+        loadingTracker?.receivedWarning(with: warningMessage, for: chartIQUrl)
     }
 }
 
