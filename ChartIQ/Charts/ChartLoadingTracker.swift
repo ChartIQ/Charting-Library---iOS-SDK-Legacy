@@ -11,6 +11,7 @@ import Foundation
 protocol ChartLoadingTrackingDelegate: class {
     func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime])
     func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
+    func chartDidReceiveWarningWhenLoadingWith(_ message: String, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
 
@@ -20,6 +21,7 @@ enum ChartLoadingState {
     case htmlLoaded(Date)
     case studiesLoaded(Date)
     case loaded
+    case warning(String)
     case failed(Error)
     
     var name: String {
@@ -34,6 +36,8 @@ enum ChartLoadingState {
             return "studiesLoaded"
         case .loaded:
             return "loaded"
+        case .warning:
+            return "warning"
         case .failed:
             return "failed"
         }
@@ -116,7 +120,12 @@ class ChartLoadingTracker {
             (.start(let date), .failed),
             (.commit(let date), .failed),
             (.htmlLoaded(let date), .failed),
-            (.studiesLoaded(let date), .failed):
+            (.studiesLoaded(let date), .failed),
+                // transitions to warning
+            (.start(let date), .warning),
+            (.commit(let date), .warning),
+            (.htmlLoaded(let date), .warning),
+            (.studiesLoaded(let date), .warning):
                 let now = Date()
                 let elapsedTime = ChartLoadingElapsedTime(from: oldValue, to: state, time: now.timeIntervalSince(date))
                 elapsedTimes.append(elapsedTime)
@@ -146,6 +155,11 @@ class ChartLoadingTracker {
     func loaded() {
         state = .loaded
         delegate?.chartDidFinishLoading(elapsedTimes: elapsedTimes)
+    }
+    
+    func receivedWarning(with message: String, for url: String) {
+        state = .warning(message)
+        delegate?.chartDidReceiveWarningWhenLoadingWith(message, elapsedTimes: elapsedTimes, for: url)
     }
     
     func failed(with error: Error, for url: String) {
