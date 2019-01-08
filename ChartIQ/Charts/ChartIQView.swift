@@ -28,15 +28,6 @@ public protocol ChartIQLoadingDelegate {
     ///   - elapsedTimes: The elapsed times for all loading stages up to when the error occurred
     ///   - url: The URL String that will load the chart
     func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
-    
-    /// Called when the chart receives a warning message while loading
-    ///
-    /// - Parameters:
-    ///   - chartIQView: The ChartIQView Object
-    ///   - message: The chart loading warning string
-    ///   - elapsedTimes: The elapsed times for all loading stages up to when the error occurred
-    ///   - url: The URL String that will load the chart
-    func chartIQView(_ chartView: ChartIQView, didReceiveWarningWhenLoadingWith message: String, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
 @objc(ChartIQDataSource)
@@ -1884,18 +1875,11 @@ extension ChartIQView : WKNavigationDelegate {
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         webView.reload() //https://trac.webkit.org/changeset/232668/webkit
-        guard let warningMessage = ChartLoadingError.contentProcessDidTerminate.errorDescription else {
-            return
-        }
-        loadingTracker?.receivedWarning(with: warningMessage, for: chartIQUrl)
+        delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: " \(String(describing: ChartLoadingError.contentProcessDidTerminate.errorDescription))")
     }
 }
 
 extension ChartIQView: ChartLoadingTrackingDelegate {
-    func chartDidReceiveWarningWhenLoadingWith(_ message: String, elapsedTimes: [ChartLoadingElapsedTime], for url: String) {
-        loadingDelegate?.chartIQView(self, didReceiveWarningWhenLoadingWith: message, elapsedTimes: elapsedTimes, for: url)
-    }
-    
     func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime]) {
         loadingDelegate?.chartIQView(self, didFinishLoadingWithElapsedTimes: elapsedTimes)
     }
