@@ -1874,12 +1874,13 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        loadingTracker?.failed(with: ChartLoadingError.contentProcessDidTerminate, for: chartIQUrl)
+        webView.reload() //https://trac.webkit.org/changeset/232668/webkit
+        delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: " \(String(describing: ChartLoadingError.contentProcessDidTerminate.errorDescription))")
     }
 }
 
 extension ChartIQView: ChartLoadingTrackingDelegate {
-func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime]) {
+    func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime]) {
         loadingDelegate?.chartIQView(self, didFinishLoadingWithElapsedTimes: elapsedTimes)
     }
     
