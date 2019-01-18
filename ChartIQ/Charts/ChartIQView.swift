@@ -65,6 +65,12 @@ public protocol ChartIQDelegate
     ///   - chartIQView: The ChartIQView Object
     @objc func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView)
     
+    /// Called when the ChartIQ has drawn candles
+    ///
+    /// - Parameters:
+    ///   - chartIQView: The ChartIQView Object
+    @objc func chartIQViewDidDrawCandles(_ chartIQView: ChartIQView)
+    
     /// Called when the symbol changes
     ///
     /// - Parameters:
@@ -418,6 +424,7 @@ public class ChartIQView: UIView {
         case drawingRemoved = "drawingRemoved"
         case errorHandler = "error"
         case loadingChartFailed = "loadingChartFailed"
+        case loadingChartSuccess = "loadingChartSuccess"
     }
     
     internal static var isValidApiKey = false
@@ -473,7 +480,7 @@ public class ChartIQView: UIView {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.drawingRemoved.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.errorHandler.rawValue)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.loadingChartFailed.rawValue)
-        
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: ChartIQCallbackMessage.loadingChartSuccess.rawValue)
     }
     
     /// Sets your ROKO Mobi api id and url here.
@@ -712,6 +719,8 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.drawingRemoved.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.errorHandler.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.loadingChartFailed.rawValue)
+        userContentController.add(self, name: ChartIQCallbackMessage.loadingChartSuccess.rawValue)
+
         
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
@@ -1824,6 +1833,8 @@ extension ChartIQView: WKScriptMessageHandler {
             if let errorMessage = message.body as? String {
                 loadingTracker?.failed(with: ChartLoadingError.internalError(errorMessage), for: chartIQUrl)
             }
+        case .loadingChartSuccess:
+            delegate?.chartIQViewDidDrawCandles(self)
         }
     }
 }
