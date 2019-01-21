@@ -870,8 +870,8 @@ public class ChartIQView: UIView {
         webView.evaluateJavaScript("setTheme(\"\(theme)\");")
     }
     
-    public func resizeChart() {
-        webView.evaluateJavaScript("resizeScreen();", completionHandler: nil)
+    public func resizeChart(height: CGFloat) {
+        webView.evaluateJavaScript("resizeScreenOnRotate(\"\(height)\");", completionHandler: nil)
     }
     
     /// Clears out a chart, eliminating all references including the resizeTimer, quoteDriver, styles and eventListeners
