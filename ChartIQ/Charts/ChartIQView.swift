@@ -98,7 +98,8 @@ public protocol ChartIQDelegate
     ///   - chartIQView: The ChartIQView Object
     ///   - type: The type of log that comes from JS (log, error, warn)
     ///   - message: The actual string message that comes from JS
-    @objc func chartIQView(_ chartIQView: ChartIQView, didReceiveProxyLogging type: ChartIQProxyLoggerType, message: String)
+    ///   - chartIQVersion: The commit hash of the ChartIQ
+    @objc func chartIQView(_ chartIQView: ChartIQView, didReceiveProxyLogging type: ChartIQProxyLoggerType, message: String, chartIQVersion: String)
     
     /// Called when a user deletes a Study from the ChartIQ
     ///
@@ -720,7 +721,7 @@ public class ChartIQView: UIView {
         userContentController.add(self, name: ChartIQCallbackMessage.errorHandler.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.loadingChartFailed.rawValue)
         userContentController.add(self, name: ChartIQCallbackMessage.loadingChartSuccess.rawValue)
-
+        
         
         // Create the configuration with the user content controller
         let configuration = WKWebViewConfiguration()
@@ -1764,23 +1765,29 @@ extension ChartIQView: WKScriptMessageHandler {
             // Accepted console methods are "log," "warning," and "error".
             let message = message.body as! [String: Any]
             let method = message["method"] as? String ?? "LOG"
-            let arguments = message["arguments"] as! [String: String]
-            var msg: String = ""
-            for (_, value) in arguments {
-                if (msg.count > 0) {
-                    msg += "\n"
+            let chartVersion = message["xmChartVersion"] as? String ?? "unspecified"
+            let arguments = message["arguments"]
+            let msg: String
+            switch arguments {
+            case let stringDictionary as [String: String]:
+                let arguments = stringDictionary.values
+                msg = arguments.reduce("") { (result, argument) -> String in
+                    result + argument + "\n"
                 }
-                
-                msg += value
+            case let jsonDictionary as [String: Any]:
+                msg = jsonDictionary.description
+            default:
+                msg = "Could not extract arguments"
             }
+            
             NSLog("%@: %@", method, msg)
             print("\(method) \(msg)")
             if method == "ERROR" {
-                delegate?.chartIQView(self, didReceiveProxyLogging: .logError, message: msg)
+                delegate?.chartIQView(self, didReceiveProxyLogging: .logError, message: msg, chartIQVersion: chartVersion)
             } else if method == "WARN" {
-                delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: msg)
+                delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: msg, chartIQVersion: chartVersion)
             } else {
-                delegate?.chartIQView(self, didReceiveProxyLogging: .log, message: msg)
+                delegate?.chartIQView(self, didReceiveProxyLogging: .log, message: msg, chartIQVersion: chartVersion)
             }
         case .deletedStudy:
             guard let message = message.body as? [String: Any],
@@ -1886,7 +1893,7 @@ extension ChartIQView : WKNavigationDelegate {
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         webView.reload() //https://trac.webkit.org/changeset/232668/webkit
-        delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: " \(String(describing: ChartLoadingError.contentProcessDidTerminate.errorDescription))")
+        delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: " \(String(describing: ChartLoadingError.contentProcessDidTerminate.errorDescription))", chartIQVersion: "unspecified")
     }
 }
 
