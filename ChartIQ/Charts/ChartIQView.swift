@@ -874,6 +874,15 @@ public class ChartIQView: UIView {
         webView.loadHTMLString(htmlString, baseURL: baseURL)
     }
     
+    /// Sets the timezone on which chart data are displayed
+    ///
+    /// - Parameters:
+    ///   - timezoneIANAIdentifier: The identifier of the timezone in IANA format
+    public func setDisplayedDataTimezone(withTimezoneIANAIdentifier timezoneIANAIdentifier: String) {
+        let script = "setDisplayedDataTimezone(\"\(timezoneIANAIdentifier)\");"
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     /// Used to add a Drawing to the Chart, in Edit Mode
     ///
     /// - Parameters:
