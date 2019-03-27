@@ -1331,7 +1331,7 @@ public class ChartIQView: UIView {
         if let inputs = inputs {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted)
-                _inputs = String(data: jsonData, encoding: .utf8) ?? ""
+                _inputs = String(data: jsonData, encoding: .utf8) ?? "null"
             } catch {
                 throw ChartIQStudyError.invalidInput
             }
@@ -1339,7 +1339,7 @@ public class ChartIQView: UIView {
         if let outputs = outputs {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: outputs, options: .prettyPrinted)
-                _outputs = String(data: jsonData, encoding: .utf8) ?? ""
+                _outputs = String(data: jsonData, encoding: .utf8) ?? "null"
             } catch {
                 throw ChartIQStudyError.invalidOutput
             }
