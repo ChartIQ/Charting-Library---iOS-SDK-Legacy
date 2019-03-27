@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/ChartIQ/Charting-Library---iOS-SDK.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '9.0'
-  s.source_files = 'ChartIQ/Extension/*', 'ChartIQ/Charts/**/*', 'ChartIQ/Charts/*', 'ChartIQ/Supporting Files/*'
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3' }
+  s.source_files = 'ChartIQ/Extension/*.swift', 'ChartIQ/Charts/**/*.swift', 'ChartIQ/Charts/*.swift', 'ChartIQ/Supporting Files/*.swift'  
+  s.swift_version = '4.2'
 
 end
