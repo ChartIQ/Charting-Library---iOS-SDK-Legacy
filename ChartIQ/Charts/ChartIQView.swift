@@ -1232,6 +1232,17 @@ public class ChartIQView: UIView {
         }
     }
     
+    public func getMostPopularStudies() -> [Study] {
+        let script = "getMostPopularStudies();"
+        if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
+            let json = try! JSONSerialization.jsonObject(with: data, options: [])
+            if let dict = json as? [[String: Any]] {
+                return dict.compactMap { Study(shortName: $0["shortName"] as! String, name: $0["name"] as! String, inputs: $0["inputs"] as! [String : Any]?, outputs: $0["outputs"] as! [String : Any]?, type: "", parameters: $0["parameters"] as! [String: Any]?) }
+            }
+        }
+        return []
+    }
+    
     /// Gets all of the available studies.
     public func getStudyList() -> [Study] {
         addEvent("CHIQ_getStudyList")
