@@ -458,8 +458,8 @@ public class ChartIQView: UIView {
     
     internal func initialize() {
         setupWebView()
-        NotificationCenter.default.addObserver(self, selector: #selector(ChartIQView.applicationWillResignActive), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ChartIQView.applicationDidBecomeActive), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ChartIQView.applicationWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ChartIQView.applicationDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     /// Cleans up the message handlers in order to avoid a memory leak.
@@ -662,12 +662,12 @@ public class ChartIQView: UIView {
     // MARK: - Notification Handler
     
     /// Handles UIApplicationWillResignActive notification
-    func applicationWillResignActive() {
+    @objc func applicationWillResignActive() {
         addEvent("_ROKO.Inactive User")
     }
     
     /// Handles UIApplicationDidBecomeActive notification
-    func applicationDidBecomeActive() {
+    @objc func applicationDidBecomeActive() {
         addEvent("_ROKO.Active User")
     }
     
@@ -843,7 +843,7 @@ public class ChartIQView: UIView {
     /// - Parameters:
     ///   - symbol: The symbol for the new chart - a symbol string
     public func setSymbol(_ symbol: String) {
-        if(UIAccessibilityIsVoiceOverRunning()) {
+        if(UIAccessibility.isVoiceOverRunning) {
             let source = "accessibilityMode();"
             webView.evaluateJavaScript(source, completionHandler: nil)
         }
@@ -1341,7 +1341,7 @@ public class ChartIQView: UIView {
         if let inputs = inputs {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted)
-                _inputs = String(data: jsonData, encoding: .utf8)
+                _inputs = String(data: jsonData, encoding: .utf8) ?? "null"
             } catch {
                 throw ChartIQStudyError.invalidInput
             }
@@ -1349,7 +1349,7 @@ public class ChartIQView: UIView {
         if let outputs = outputs {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: outputs, options: .prettyPrinted)
-                _outputs = String(data: jsonData, encoding: .utf8)
+                _outputs = String(data: jsonData, encoding: .utf8) ?? "null"
             } catch {
                 throw ChartIQStudyError.invalidOutput
             }
@@ -1359,7 +1359,7 @@ public class ChartIQView: UIView {
             throw ChartIQStudyError.studyNotFound
         }
         
-        let script = "addStudy('\(name)', \(_inputs!), \(_outputs!));"
+        let script = "addStudy('\(name)', \(_inputs), \(_outputs));"
         webView.evaluateJavaScript(script, completionHandler: nil)
         addEvent("CHIQ_addStudy", parameters: ["studyName": name])
     }
@@ -1763,10 +1763,10 @@ extension ChartIQView: WKScriptMessageHandler {
                         selectedFields += ", " + volume
                     }
                     
-                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, selectedFields);
+                    UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: selectedFields);
                 } else {
                     // field is missing, just quote the entire value
-                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, quote);
+                    UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: quote);
                 }
             }
         case .log:
