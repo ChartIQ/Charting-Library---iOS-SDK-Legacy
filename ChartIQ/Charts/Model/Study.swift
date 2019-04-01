@@ -16,8 +16,9 @@ open class Study: NSObject, NSCoding {
     open var outputs: [String: Any]?
     open var parameters: [String: Any]?
     open var type = ""
+    open var priority: Int = 0
     
-    public init(shortName: String, name: String, inputs: [String: Any]?, outputs: [String: Any]?, type: String, parameters: [String: Any]?) {
+    public init(shortName: String, name: String, inputs: [String: Any]?, outputs: [String: Any]?, type: String, parameters: [String: Any]?, priority: Int) {
         super.init()
         self.shortName = shortName
         self.name = name.replacingOccurrences(of: "|", with: "")
@@ -25,6 +26,7 @@ open class Study: NSObject, NSCoding {
         self.outputs = outputs
         self.type = type
         self.parameters = parameters
+        self.priority = priority
     }
     
     required public init(coder aDecoder: NSCoder) {
@@ -34,7 +36,7 @@ open class Study: NSObject, NSCoding {
         self.inputs = aDecoder.decodeObject(forKey: "inputs") as? [String: Any]
         self.outputs = aDecoder.decodeObject(forKey: "outputs") as? [String: Any]
         self.parameters = aDecoder.decodeObject(forKey: "parameters") as? [String: Any]
-        
+        self.priority = aDecoder.decodeObject(forKey: "priority") as? Int ?? 0
     }
     
     public func encode(with aCoder: NSCoder) {
@@ -44,5 +46,6 @@ open class Study: NSObject, NSCoding {
         aCoder.encode(inputs, forKey: "inputs")
         aCoder.encode(outputs, forKey: "outputs")
         aCoder.encode(parameters, forKey: "parameters")
+        aCoder.encode(priority, forKey: "priority")
     }
 }
