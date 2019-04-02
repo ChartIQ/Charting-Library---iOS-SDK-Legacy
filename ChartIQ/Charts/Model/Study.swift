@@ -49,3 +49,17 @@ open class Study: NSObject, NSCoding {
         aCoder.encode(priority, forKey: "priority")
     }
 }
+
+extension Study {
+    convenience init?(json: [String: Any]) {
+        guard let shortName = json["shortName"] as? String,
+            let name = json["name"] as? String,
+            let priority = json["priority"] as? Int else { return nil }
+        
+        let inputs = json["inputs"] as? [String : Any] ?? [String : Any]()
+        let outputs = json["outputs"] as? [String : Any] ?? [String : Any]()
+        let parameters = json["parameters"] as? [String : Any] ?? [String : Any]()
+        
+        self.init(shortName: shortName, name: name, inputs: inputs, outputs: outputs, type: "", parameters: parameters, priority: priority)
+    }
+}

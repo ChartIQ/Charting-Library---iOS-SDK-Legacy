@@ -1215,7 +1215,7 @@ public class ChartIQView: UIView {
             if let result = result as? String, let data = result.data(using: .utf8) {
                 let json = try! JSONSerialization.jsonObject(with: data, options: [])
                 if let dict = json as? [[String: Any]] {
-                    strongSelf.studyObjects = dict.map { Study(shortName: $0["shortName"] as! String, name: $0["name"] as! String, inputs: $0["inputs"] as! [String : Any]?, outputs: $0["outputs"] as! [String : Any]?, type: "", parameters: $0["parameters"] as! [String: Any]?, priority: $0["priority"] as! Int) }
+                    strongSelf.studyObjects = dict.compactMap { Study(json: $0) }
                     strongSelf.studyObjects.sort{ $0.name.localizedCaseInsensitiveCompare($1.name) == ComparisonResult.orderedAscending  }
                 }
             }
