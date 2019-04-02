@@ -1390,7 +1390,7 @@ public class ChartIQView: UIView {
                 }
                 let inputString = components[1]
                 let outputString = components[2]
-                let typeString = components[3]
+                let shortName = components[3]
                 let parametersString = components[4]
                 var inputs: [String: Any]?
                 var outputs: [String: Any]?
@@ -1404,7 +1404,7 @@ public class ChartIQView: UIView {
                 if !parametersString.isEmpty, let data = parametersString.data(using: .utf8) {
                     parameters = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
                 }
-                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs, type: typeString, parameters: parameters, priority: 0)
+                let studyObject = Study(shortName: shortName, name: name, inputs: inputs, outputs: outputs, parameters: parameters, priority: 0)
                 addedStudy.append(studyObject)
             })
         }
