@@ -1205,7 +1205,7 @@ public class ChartIQView: UIView {
     
     /// Gets all of the available studies.
     fileprivate func getStudyObjects(completionHandler: @escaping () -> Void) {
-        let script = "JSON.stringify(CIQ.Studies.studyLibrary);"
+        let script = "JSON.stringify(getStudyList());"
         webView.evaluateJavaScript(script) { [weak self](result, error) in
             guard let strongSelf = self else {
                 completionHandler()
@@ -1214,17 +1214,8 @@ public class ChartIQView: UIView {
             strongSelf.studyObjects = [Study]()
             if let result = result as? String, let data = result.data(using: .utf8) {
                 let json = try! JSONSerialization.jsonObject(with: data, options: [])
-                if let dict = json as? [String: Any] {
-                    for key in dict.keys {
-                        if let studyDict = dict[key] as? [String: Any] {
-                            var studyName = key
-                            if let name = studyDict["name"] as? String, !name.isEmpty {
-                                studyName = name
-                            }
-                            let study = Study(shortName: key, name: studyName, inputs: studyDict["inputs"] as! [String : Any]?, outputs: studyDict["outputs"] as! [String : Any]?, type: "", parameters: studyDict["parameters"] as! [String: Any]?)
-                            strongSelf.studyObjects.append(study)
-                        }
-                    }
+                if let dict = json as? [[String: Any]] {
+                    strongSelf.studyObjects = dict.compactMap { Study(json: $0) }
                     strongSelf.studyObjects.sort{ $0.name.localizedCaseInsensitiveCompare($1.name) == ComparisonResult.orderedAscending  }
                 }
             }
@@ -1399,7 +1390,7 @@ public class ChartIQView: UIView {
                 }
                 let inputString = components[1]
                 let outputString = components[2]
-                let typeString = components[3]
+                let shortName = components[3]
                 let parametersString = components[4]
                 var inputs: [String: Any]?
                 var outputs: [String: Any]?
@@ -1413,7 +1404,7 @@ public class ChartIQView: UIView {
                 if !parametersString.isEmpty, let data = parametersString.data(using: .utf8) {
                     parameters = (try? JSONSerialization.jsonObject(with: data, options: [])) as! [String: Any]?
                 }
-                let studyObject = Study(shortName: name, name: name, inputs: inputs, outputs: outputs, type: typeString, parameters: parameters)
+                let studyObject = Study(shortName: shortName, name: name, inputs: inputs, outputs: outputs, parameters: parameters, priority: 0)
                 addedStudy.append(studyObject)
             })
         }
