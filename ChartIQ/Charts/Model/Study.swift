@@ -59,3 +59,9 @@ extension Study {
         self.init(shortName: shortName, name: name, inputs: inputs, outputs: outputs, parameters: parameters, priority: priority)
     }
 }
+
+extension Study: Comparable {
+    public static func < (lhs: Study, rhs: Study) -> Bool {
+        return lhs.priority > rhs.priority
+    }
+}
