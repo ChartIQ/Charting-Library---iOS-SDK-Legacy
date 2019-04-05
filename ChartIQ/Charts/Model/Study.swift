@@ -16,8 +16,9 @@ open class Study: NSObject, NSCoding {
     open var outputs: [String: Any]?
     open var parameters: [String: Any]?
     open var priority: Int = 0
+    open var type = ""
     
-    public init(shortName: String, name: String, inputs: [String: Any]?, outputs: [String: Any]?, parameters: [String: Any]?, priority: Int) {
+    public init(shortName: String, name: String, inputs: [String: Any]?, outputs: [String: Any]?, parameters: [String: Any]?, priority: Int,  type: String) {
         super.init()
         self.shortName = shortName
         self.name = name.replacingOccurrences(of: "|", with: "")
@@ -25,6 +26,7 @@ open class Study: NSObject, NSCoding {
         self.outputs = outputs
         self.parameters = parameters
         self.priority = priority
+        self.type = type
     }
     
     required public init(coder aDecoder: NSCoder) {
@@ -34,6 +36,7 @@ open class Study: NSObject, NSCoding {
         self.outputs = aDecoder.decodeObject(forKey: "outputs") as? [String: Any]
         self.parameters = aDecoder.decodeObject(forKey: "parameters") as? [String: Any]
         self.priority = aDecoder.decodeObject(forKey: "priority") as? Int ?? 0
+        self.type = aDecoder.decodeObject(forKey: "type") as? String ?? ""
     }
     
     public func encode(with aCoder: NSCoder) {
@@ -43,6 +46,7 @@ open class Study: NSObject, NSCoding {
         aCoder.encode(outputs, forKey: "outputs")
         aCoder.encode(parameters, forKey: "parameters")
         aCoder.encode(priority, forKey: "priority")
+        aCoder.encode(type, forKey: "type")
     }
 }
 
@@ -56,7 +60,7 @@ extension Study {
         let outputs = json["outputs"] as? [String : Any] ?? [String : Any]()
         let parameters = json["parameters"] as? [String : Any] ?? [String : Any]()
         
-        self.init(shortName: shortName, name: name, inputs: inputs, outputs: outputs, parameters: parameters, priority: priority)
+        self.init(shortName: shortName, name: name, inputs: inputs, outputs: outputs, parameters: parameters, priority: priority, type: shortName)
     }
 }
 
