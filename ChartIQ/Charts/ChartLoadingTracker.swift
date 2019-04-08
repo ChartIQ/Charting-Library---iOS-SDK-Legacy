@@ -10,7 +10,7 @@ import Foundation
 
 protocol ChartLoadingTrackingDelegate: class {
     func chartDidFinishLoading(elapsedTimes: [ChartLoadingElapsedTime])
-    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
+    func chartDidFailLoadingWithError(_ error: ChartLoadingError, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
 
@@ -69,17 +69,20 @@ extension Array where Element == ChartLoadingElapsedTime {
     }
 }
 
-enum ChartLoadingError: Error {
-    case timeout
+public enum ChartLoadingError: Error {
+    case navigation(Error)
+    case provisionalNavigation(Error)
     case contentProcessDidTerminate
     case internalError(String)
 }
 
 extension ChartLoadingError: LocalizedError {
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
-        case .timeout:
-            return "timeout"
+        case .navigation:
+            return "navigation"
+        case .provisionalNavigation:
+            return "provisionalNavigation"
         case .contentProcessDidTerminate:
             return "content process terminated"
         case .internalError(let message):
@@ -148,7 +151,7 @@ class ChartLoadingTracker {
         delegate?.chartDidFinishLoading(elapsedTimes: elapsedTimes)
     }
     
-    func failed(with error: Error, for url: String) {
+    func failed(with error: ChartLoadingError, for url: String) {
         state = .failed(error)
         delegate?.chartDidFailLoadingWithError(error, elapsedTimes: elapsedTimes, for: url)
     }

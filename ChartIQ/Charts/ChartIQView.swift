@@ -10,8 +10,8 @@ import UIKit
 import WebKit
 import CoreTelephony
 
-@objc(ChartIQLoadingDelegate)
-public protocol ChartIQLoadingDelegate {
+
+public protocol ChartIQLoadingDelegate: class {
     /// Called when the chart has been loaded
     /// html loaded, studies loaded, candles loaded
     ///
@@ -27,7 +27,7 @@ public protocol ChartIQLoadingDelegate {
     ///   - error: The chart loading error
     ///   - elapsedTimes: The elapsed times for all loading stages up to when the error occurred
     ///   - url: The URL String that will load the chart
-    func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
+    func chartIQView(_ chartView: ChartIQView, didFailLoadingWithError error: ChartLoadingError, elapsedTimes: [ChartLoadingElapsedTime], for url: String)
 }
 
 @objc(ChartIQDataSource)
@@ -1884,16 +1884,15 @@ extension ChartIQView : WKNavigationDelegate {
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        loadingTracker?.failed(with: error, for: chartIQUrl)
+        loadingTracker?.failed(with: .navigation(error), for: chartIQUrl)
     }
     
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        loadingTracker?.failed(with: error, for: chartIQUrl)
+        loadingTracker?.failed(with: .provisionalNavigation(error), for: chartIQUrl)
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        webView.reload() //https://trac.webkit.org/changeset/232668/webkit
-        delegate?.chartIQView(self, didReceiveProxyLogging: .logWarn, message: " \(String(describing: ChartLoadingError.contentProcessDidTerminate.errorDescription))", chartIQVersion: "unspecified")
+        loadingTracker?.failed(with: .contentProcessDidTerminate, for: chartIQUrl)
     }
 }
 
@@ -1902,7 +1901,7 @@ extension ChartIQView: ChartLoadingTrackingDelegate {
         loadingDelegate?.chartIQView(self, didFinishLoadingWithElapsedTimes: elapsedTimes)
     }
     
-    func chartDidFailLoadingWithError(_ error: Error, elapsedTimes: [ChartLoadingElapsedTime], for url: String) {
+    func chartDidFailLoadingWithError(_ error: ChartLoadingError, elapsedTimes: [ChartLoadingElapsedTime], for url: String) {
         loadingDelegate?.chartIQView(self, didFailLoadingWithError: error, elapsedTimes: elapsedTimes, for: url)
     }
 }
