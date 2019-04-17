@@ -14,6 +14,6 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '9.0'
   s.source_files = 'ChartIQ/Extension/*', 'ChartIQ/Charts/**/*', 'ChartIQ/Charts/*', 'ChartIQ/Supporting Files/*'
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3' }
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '5' }
 
 end
