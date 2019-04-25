@@ -654,8 +654,10 @@ public class ChartIQView: UIView {
         let obj = data.map{ $0.toDictionary() }
         let jsonData = try! JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
-        let script = "callNewChart(\"\", \(jsonString!)); "
-        webView.evaluateJavaScript(script, completionHandler: nil)
+        let script = "callNewChart(\"\", \(jsonString)); "
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.webView.evaluateJavaScript(script, completionHandler: nil)
+        }
     }
     
     /// Uses this method to stream OHLC data into a chart.
