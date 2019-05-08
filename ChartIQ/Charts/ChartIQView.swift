@@ -143,10 +143,9 @@ public enum ChartIQDrawingTool: Int {
 /// Chart that draw ChartIQ chart.
 public class ChartIQView: UIView {
 
+    var webView: WKWebView!
+    
     // MARK: - Properties
-    
-    internal var webView: WKWebView!
-    
     static internal var url = ""
     static internal var refreshInterval = 0
     static internal var voiceoverFields: [String: Bool] = [:]
