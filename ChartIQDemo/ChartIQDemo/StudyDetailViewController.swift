@@ -243,7 +243,7 @@ class StudyDetailViewController: UITableViewController {
             cell.labels?[1].text = (parameter["value"] as? String)?.capitalized ?? ""
         case .number, .text:
             cell.textFields![0].keyboardType = optionType == .number ? .numberPad : .default
-            cell.textFields?[0].text = optionType == .number ? String(parameter["value"] as? Float ?? 5) : parameter["value"] as? String ?? ""
+            cell.textFields?[0].text = optionType == .number ? String(parameter["value"] as? Float ?? 0) : parameter["value"] as? String ?? ""
             cell.textFieldValueDidEndEditingBlock = {[weak self] (cell, textField) in
                 guard let strongSelf = self else { return }
                 let name = cell.labels![0].text ?? ""

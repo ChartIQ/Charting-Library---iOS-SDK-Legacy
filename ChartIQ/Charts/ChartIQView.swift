@@ -721,29 +721,12 @@ public class ChartIQView: UIView {
         return nil
     }
     
-    /// Gets study output parameters.
+    /// Gets study outputs or parameters.
     ///
     /// - Parameter name: The study name
     /// - Returns: The JSON Object or nil if an error occur
-    public func getStudyOutputParameters(by name: String) -> Any?  {
-        let script = "getStudyParameters(\"" + name + "\" , \"outputs\");"
-        if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: [])
-                return json
-            } catch {
-                return nil
-            }
-        }
-        return nil
-    }
-    
-    /// Gets study 'parameters' parameters
-    ///
-    /// - Parameter name: The study name
-    /// - Returns: The JSON Object or nul if an error occur
-    public func getStudyParameters(by name: String) -> Any? {
-        let script = "getStudyParameters(\"" + name + "\" , \"parameters\");"
+    public func getStudyOutputsOrParameters(by name: String, type: String) -> Any?  {
+        let script = "getStudyParameters(\"" + name + "\" , \"" + type + "\");"
         if let jsonString = webView.evaluateJavaScriptWithReturn(script), let data = jsonString.data(using: .utf8) {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: [])
