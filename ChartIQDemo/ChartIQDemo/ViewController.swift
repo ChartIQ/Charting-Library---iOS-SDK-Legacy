@@ -547,8 +547,14 @@ extension ViewController: ChartIQDelegate {
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
             chartIQView.setRefreshInterval(refreshInterval)
-            chartIQView.setDataMethod(.pull)
             chartIQView.setSymbol(defaultSymbol)
+            chartIQView.setDataMethod(.pull)
+            
+            // if .push is used you'll probably want to make use of the chartIQView.isChartAvailable() method for your initial data push.
+            /*************************************************
+             * if(chartIQView.isChartAvailable() { pushData }
+             * else{ repeat check via recursion }
+            *************************************************/
         }
         
         func loadVoiceoverFields() {
