@@ -547,8 +547,8 @@ extension ViewController: ChartIQDelegate {
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
             chartIQView.setRefreshInterval(refreshInterval)
-            chartIQView.setSymbol(defaultSymbol)
             chartIQView.setDataMethod(.pull)
+            chartIQView.setSymbol(defaultSymbol)
             
             // if .push is used you'll probably want to make use of the chartIQView.isChartAvailable() method for your initial data push.
             /*************************************************
