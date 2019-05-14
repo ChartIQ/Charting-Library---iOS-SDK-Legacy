@@ -624,6 +624,14 @@ public class ChartIQView: UIView {
         return nil
     }
     
+    /// Checks if chart has finished loading
+    ///
+    /// - Returns: true if the chart has finished loading
+    public func isChartAvailable() -> Bool {
+        let script = "if (isChartAvailable() == true) { \"true\" } else { \"false\" } "
+        return webView.evaluateJavaScriptWithReturn(script) == "true"
+    }
+
     /// Sets the theme for the chart
     /// 'none' is there if the user wants to use custom themes they created
     /// valid values: day, night, none
@@ -654,9 +662,7 @@ public class ChartIQView: UIView {
         let jsonData = try! JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
         let jsonString = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
         let script = "callNewChart(\"\", \(jsonString)); "
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.webView.evaluateJavaScript(script, completionHandler: nil)
-        }
+        self.webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
     /// Uses this method to stream OHLC data into a chart.
