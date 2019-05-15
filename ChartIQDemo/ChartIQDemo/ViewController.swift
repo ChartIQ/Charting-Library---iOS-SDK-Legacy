@@ -319,8 +319,8 @@ class ViewController: UIViewController {
         viewController.getStudyParameterBlock = {[weak self] (study) -> (Any?, Any?, Any?) in
             guard let strongSelf = self else { return (nil, nil, nil)}
             let input = strongSelf.chartIQView.getStudyInputParameters(by: study)
-            let output = strongSelf.chartIQView.getStudyOutputParameters(by: study)
-            let parameters = strongSelf.chartIQView.getStudyParameters(by: study)
+            let output = strongSelf.chartIQView.getStudyOutputsOrParameters(by: study, type: "outputs")
+            let parameters = strongSelf.chartIQView.getStudyOutputsOrParameters(by: study, type: "parameters")
             return (input, output, parameters)
         }
         
@@ -347,7 +347,6 @@ class ViewController: UIViewController {
         }
     }
 
-    
     func loadChartInitialData(symbol: String, period: Int, interval: String, completionHandler: @escaping ([ChartIQData]) -> Void) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.sss'Z'"
@@ -403,7 +402,7 @@ class ViewController: UIViewController {
                 "&interval=\(params.interval)" +
                 "&period=\(params.period)" +
                 "&extended=1" +
-                "&session=\(uuid)"
+        		"&session=\(uuid)"
         guard let url = URL(string: urlString) else { return }
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let strongSelf = self else { return }
@@ -543,18 +542,12 @@ extension ViewController: ChartIQDataSource {
 // MARK: - ChartIQDelegate
 
 extension ViewController: ChartIQDelegate {
-    
+
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
             chartIQView.setRefreshInterval(refreshInterval)
             chartIQView.setSymbol(defaultSymbol)
             chartIQView.setDataMethod(.pull)
-            
-            // if .push is used you'll probably want to make use of the chartIQView.isChartAvailable() method for your initial data push.
-            /*************************************************
-             * if(chartIQView.isChartAvailable() { pushData }
-             * else{ repeat check via recursion }
-            *************************************************/
         }
         
         func loadVoiceoverFields() {
@@ -569,14 +562,8 @@ extension ViewController: ChartIQDelegate {
             chartIQView.setVoiceoverFields(voiceoverFields);
         }
         
-        if let user = UserDefaults.standard.value(forKey: "SetUser") as? String {
-            ChartIQView.setUser(user, completionHandler: { (error) in
-                if error == nil { loadDefaultSymbol() }
-            })
-        } else {
-            loadDefaultSymbol()
-        }
         
+        loadDefaultSymbol()
         loadVoiceoverFields()
     }
     
@@ -630,7 +617,7 @@ extension ViewController : UITableViewDataSource {
         return tableView == lineTableView ? Line(rawValue: section)!.count : Intervals(rawValue: section)!.intervalCount
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {        
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return tableView == lineTableView ? Line(rawValue: section)!.headerHeight : 1
     }
     
@@ -723,4 +710,3 @@ extension ViewController : UICollectionViewDataSource, UICollectionViewDelegate,
         colorPickerView.isHidden = true
     }
 }
-
