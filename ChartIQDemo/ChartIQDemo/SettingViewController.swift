@@ -254,9 +254,6 @@ class SettingViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "SetUser", style: .default, handler: { [weak alert] (_) in
             let user = alert!.textFields![0].text ?? ""
             UserDefaults.standard.set(user, forKey: "SetUser")
-            ChartIQView.setUser(user, completionHandler: { (error) in
-                
-            })
         }))
         present(alert, animated: true, completion: nil)
     }
