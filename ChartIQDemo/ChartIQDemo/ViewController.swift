@@ -546,8 +546,8 @@ extension ViewController: ChartIQDelegate {
     func chartIQViewDidFinishLoading(_ chartIQView: ChartIQView) {
         func loadDefaultSymbol() {
             chartIQView.setRefreshInterval(refreshInterval)
-            chartIQView.setSymbol(defaultSymbol)
             chartIQView.setDataMethod(.pull)
+            chartIQView.setSymbol(defaultSymbol)
         }
         
         func loadVoiceoverFields() {
