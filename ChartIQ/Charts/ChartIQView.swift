@@ -422,7 +422,7 @@ public class ChartIQView: UIView {
         let script = "determineOs()"
         webView.evaluateJavaScript(script, completionHandler: nil)
         if method == .pull {
-            print("If you want to add your quotefeed check your html template")
+            print("If you want to add a quotefeed please do so in your javascript code.")
         } else {
             let script = "callNewChart(); "
             webView.evaluateJavaScript(script, completionHandler: nil)
