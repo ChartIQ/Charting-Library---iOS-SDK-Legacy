@@ -111,7 +111,7 @@ class ViewController: UIViewController {
         crosshairBarButton.tintColor = UIColor.white
         navigationItem.rightBarButtonItems = [crosshairBarButton, periodBarButton]
         let logoImageview = UIImageView(image: #imageLiteral(resourceName: "Logo"))
-        let negativeSpacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        let negativeSpacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.fixedSpace, target: nil, action: nil)
         negativeSpacer.width = -6
         
         navigationItem.leftBarButtonItems = [negativeSpacer, UIBarButtonItem(customView: logoImageview)]
@@ -340,7 +340,7 @@ class ViewController: UIViewController {
         }
         
         // Gets added studies
-        viewController.getAddedStudiesBlock = {[weak self] (study) -> [Study] in
+        viewController.getAddedStudiesBlock = {[weak self] () -> [Study] in
             guard let strongSelf = self else { return [Study]() }
             return strongSelf.chartIQView.getAddedStudyList()
         }

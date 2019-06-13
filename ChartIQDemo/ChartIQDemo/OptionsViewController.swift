@@ -47,7 +47,7 @@ class OptionsViewController: UITableViewController {
         button.titleLabel?.font = UIFont(name: "Roboto-Regular", size: 12)
         button.addTarget(self, action: #selector(OptionsViewController.rightBarButtonDidClick), for: .touchUpInside)
         let barButton = UIBarButtonItem(customView: button)
-        let negativeSpacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        let negativeSpacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.fixedSpace, target: nil, action: nil)
         negativeSpacer.width = -5
         navigationItem.rightBarButtonItems = [negativeSpacer, barButton]
     }

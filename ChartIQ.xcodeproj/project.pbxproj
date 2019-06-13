@@ -225,7 +225,7 @@
 					7AA3C6591E24975500DD69AE = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 7J6873JY5V;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					7AA3C6621E24975500DD69AE = {
@@ -433,7 +433,7 @@
 				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/ChartIQ";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -459,7 +459,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/ChartIQ";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
