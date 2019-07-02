@@ -54,7 +54,7 @@ class StudyDetailViewController: UITableViewController {
 
         setupNavigationBar()
         setupColorPicker()
-        NotificationCenter.default.addObserver(self, selector: #selector(StudyDetailViewController.keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(StudyDetailViewController.keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -119,7 +119,7 @@ class StudyDetailViewController: UITableViewController {
         editButton.titleLabel?.font = UIFont(name: "Roboto-Regular", size: 12)
         editButton.addTarget(self, action: #selector(StudyDetailViewController.editButtonDidClick), for: .touchUpInside)
         let editBarButton = UIBarButtonItem(customView: editButton)
-        let negativeSpacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        let negativeSpacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.fixedSpace, target: nil, action: nil)
         negativeSpacer.width = -5
         navigationItem.rightBarButtonItems = [negativeSpacer, editBarButton]
     }
@@ -147,7 +147,7 @@ class StudyDetailViewController: UITableViewController {
     
     // MARK: - Helper
     
-    func keyboardWillShow() {
+    @objc func keyboardWillShow() {
         colorPicker.isHidden = true
     }
 
