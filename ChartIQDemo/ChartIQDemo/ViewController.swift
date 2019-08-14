@@ -89,6 +89,8 @@ class ViewController: UIViewController {
             setupSearchStudiesController(viewController)
         }
     }
+
+    // MARK: - Layout
     
     func setupNavigationBar() {
         periodButton = UIButton(type: .custom)
