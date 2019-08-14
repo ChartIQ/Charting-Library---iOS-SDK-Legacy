@@ -968,7 +968,7 @@ public class ChartIQView: UIView {
         let jsonData = try! JSONSerialization.data(withJSONObject: args, options: .prettyPrinted)
         let json = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\n", with: "") ?? ""
         
-        let script = "stxx.\(functionName)(\(json));"
+        let script = "stxx.\(functionName)(\(json.dropFirst().dropLast()));"
         let value = webView.evaluateJavaScriptWithReturn(script)
         var result = ""
 
