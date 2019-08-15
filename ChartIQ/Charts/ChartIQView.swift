@@ -644,7 +644,6 @@ public class ChartIQView: UIView {
     /// Sets the chart data by push.
     ///
     /// - Parameters:
-    ///   - symbol: The symbol for the new chart
     ///   - data: An array of properly formatted OHLC quote objects to create a chart
     public func push(_ data: [ChartIQData]) {
         let obj = data.map{ $0.toDictionary() }
