@@ -869,6 +869,10 @@ public class ChartIQView: UIView {
     public func setTheme(_ theme: String) {
         webView.evaluateJavaScript("setTheme(\"\(theme)\");")
     }
+  
+    public func resizeInitialChart(height: CGFloat, width: CGFloat) {
+        webView.evaluateJavaScript("resizeInitialScreen(\"\(height)\",\"\(width)\");", completionHandler: nil)
+    }
     
     public func resizeChart(height: CGFloat) {
         webView.evaluateJavaScript("resizeScreenOnRotate(\"\(height)\");", completionHandler: nil)
