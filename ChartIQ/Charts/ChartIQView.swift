@@ -417,7 +417,6 @@ public class ChartIQView: UIView {
     ///
     /// - Parameter method: The data method
     public func setDataMethod(_ method: ChartIQDataMethod) {
-        clear()
         _dataMethod = method
         let script = "determineOs()"
         webView.evaluateJavaScript(script, completionHandler: nil)
