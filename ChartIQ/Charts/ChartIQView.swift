@@ -547,7 +547,14 @@ public class ChartIQView: UIView {
     ///   - property: The property name of the object you wish to change
     ///   - value: The value to assign to the property
     public func setChartProperty(_ property: String, value: Any) {
-        let script = "stxx.chart.\(property) = \"\(value)\";"
+        var script = ""
+        if value is String {
+            script = "stxx.chart.\(property) = \"\(value)\";"
+        }
+        else {
+            script = "stxx.chart\(property) = \(value);"
+        }
+
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
@@ -566,7 +573,14 @@ public class ChartIQView: UIView {
     ///   - property: The property name of the object you wish to change
     ///   - value: The value to assign to the property
     public func setEngineProperty(_ property: String, value: Any) {
-        let script = "stxx.\(property) = \"\(value)\";"
+        var script = ""
+        if value is String {
+            script = "stxx.\(property) = \"\(value)\";"
+        }
+        else {
+            script = "stxx.\(property) = \(value);"
+        }
+
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
     
