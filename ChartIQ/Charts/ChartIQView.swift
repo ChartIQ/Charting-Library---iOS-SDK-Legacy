@@ -1055,6 +1055,13 @@ public class ChartIQView: UIView {
         return jsonString ?? ""
     }
     
+    /// Helper to get the current webview
+    ///
+    /// - Returns: the current webview
+    public func getWebView() -> WKWebView {
+        return webView
+    }
+    
 }
 
 // MARK: - WKScriptMessageHandler
