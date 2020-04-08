@@ -550,8 +550,7 @@ public class ChartIQView: UIView {
         var script = ""
         if value is String {
             script = "stxx.chart.\(property) = \"\(value)\";"
-        }
-        else {
+        } else {
             script = "stxx.chart\(property) = \(value);"
         }
 
@@ -576,8 +575,7 @@ public class ChartIQView: UIView {
         var script = ""
         if value is String {
             script = "stxx.\(property) = \"\(value)\";"
-        }
-        else {
+        } else {
             script = "stxx.\(property) = \(value);"
         }
 
