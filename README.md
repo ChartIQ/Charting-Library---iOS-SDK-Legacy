@@ -7,7 +7,7 @@ This SDK has been designed to support a [basic application](https://github.com/C
 
 - A valid version of the ChartIQ library (version 7.0.5 &ndash; 7.5.0). Please contact info@cosaic.io if you do not already have a license or evaluation version.
 
-## Sample App
+## Sample app
 
 A sample app using this SDK can be found here: https://github.com/ChartIQ/Charting-Library---iOS-Sample-App
 
