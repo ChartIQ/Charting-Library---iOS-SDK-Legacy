@@ -248,6 +248,12 @@ class StudyDetailViewController: UITableViewController {
         case .number, .text, .date, .time:
             cell.textFields![0].keyboardType = optionType == .number ? .numberPad : .default
             cell.textFields?[0].text = optionType == .number ? String(parameter["value"] as? Float ?? 0) : parameter["value"] as? String ?? ""
+            if(optionType == .date) {
+                cell.labels?[0].text! += " (yyyymmdd)"
+            }
+            if(optionType == .time) {
+                cell.labels?[0].text! += " (hh:mm:ss)"
+            }
             cell.textFieldValueDidEndEditingBlock = {[weak self] (cell, textField) in
                 guard let strongSelf = self else { return }
                 let name = cell.labels![0].text ?? ""
