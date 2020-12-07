@@ -88,6 +88,8 @@ public enum ChartIQChartType: Int {
     case candle
     case bar
     case wave
+    case vertex_line
+    case step
     case colored_bar
     case colored_line
     case hollow_candle
@@ -97,6 +99,7 @@ public enum ChartIQChartType: Int {
     case baseline_delta_mountain
     case mountain
     case colored_mountain
+    case colored_hlc
 }
 
 /// Aggregation type
@@ -256,6 +259,10 @@ public class ChartIQView: UIView {
             return .bar
         } else if _type == "wave" {
             return .wave
+        } else if _type == "vertex_line" {
+            return .vertex_line
+        } else if _type == "step" {
+            return .step
         } else if _type == "colored_bar" {
             return .colored_bar
         } else if _type == "colored_line" {
@@ -274,6 +281,8 @@ public class ChartIQView: UIView {
             return .mountain
         } else if _type == "colored_mountain" {
             return .colored_mountain
+        } else if _type == "colored_hlc" {
+            return .colored_hlc
         } else {
             return .bar
         }
@@ -655,6 +664,8 @@ public class ChartIQView: UIView {
         case .candle: chartType = "candle"
         case .bar: chartType = "bar"
         case .wave: chartType = "wave"
+        case .vertex_line: chartType = "vertex_line"
+        case .step: chartType = "step"
         case .colored_bar: chartType = "colored_bar"
         case .colored_line: chartType = "colored_line"
         case .hollow_candle: chartType = "hollow_candle"
@@ -664,6 +675,7 @@ public class ChartIQView: UIView {
         case .baseline_delta_mountain: chartType = "baseline_delta_mountain"
         case .mountain: chartType = "mountain"
         case .colored_mountain: chartType  = "colored_mountain"
+        case .colored_hlc: chartType = "colored_hlc"
         }
         let script = "setChartType(\"\(chartType)\");"
         webView.evaluateJavaScript(script, completionHandler: nil)
