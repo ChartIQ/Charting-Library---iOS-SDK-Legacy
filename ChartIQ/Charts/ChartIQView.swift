@@ -1007,7 +1007,7 @@ public class ChartIQView: UIView {
             "   var input = helper.inputs[x]; " +
             "   if (input[\"name\"] === \"\(parameter)\") { " +
             "       isFound = true; " +
-            "       if (input[\"type\"] === \"text\" || input[\"type\"] === \"select\") { " +
+            "       if (input[\"type\"] === \"text\" || input[\"type\"] === \"select\" || input[\"type\"] === \"date\" || input[\"type\"] === \"time\") { " +
             "           newInputParameters[\"\(parameter)\"] = \"\(value)\"; " +
             "       } else if (input[\"type\"] === \"number\") { " +
             "           newInputParameters[\"\(parameter)\"] = parseFloat(\"\(value)\"); " +
