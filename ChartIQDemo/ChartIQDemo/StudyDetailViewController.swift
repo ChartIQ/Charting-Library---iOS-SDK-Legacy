@@ -135,8 +135,6 @@ class StudyDetailViewController: UITableViewController {
             guard let strongSelf = self else { return }
             if strongSelf.selectedCellIndex > (strongSelf.outputParameter.count + strongSelf.inputParameter.count) {
                 var parameter = strongSelf.paramParameter[strongSelf.selectedColorIndex]
-                // strongSelf.selectedColorIndex is 8, the length of all parameters. Need to set the index relative to the paramParameters array
-                //var parameter = strongSelf.paramParameter[3]
                 parameter["color"] = color.toHexString()
                 strongSelf.paramParameter![strongSelf.selectedCellIndex - (strongSelf.inputParameter.count + strongSelf.outputParameter.count)] = parameter
                 strongSelf.tableView.reloadData()

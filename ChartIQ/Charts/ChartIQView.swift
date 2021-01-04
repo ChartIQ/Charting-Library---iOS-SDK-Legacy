@@ -748,7 +748,6 @@ public class ChartIQView: UIView {
     ///   - key: The parameter name that must be defined in CIQ.Studies.DialogHelper
     ///   - value: The value
     public func setStudy(_ name: String, withParameter key: String, value: String) {
-        NSLog("SETSTUDY KEY VALUE")
         let script = "setStudy(\"\(name)\", \"\(key)\", \"\(value)\")"
         webView.evaluateJavaScript(script, completionHandler: nil)
     }
@@ -759,7 +758,6 @@ public class ChartIQView: UIView {
     ///   - name: The study name
     ///   - parameter: The parameter name that must be defined in CIQ.Studies.DialogHelper
     public func setStudy(_ name: String, parameters: [String: String]) {
-        NSLog("SETSTUDY PARAMETER OBJECT")
         var script = getStudyDescriptorScript(with: name) +
             "var helper = new CIQ.Studies.DialogHelper({sd:selectedSd,stx:stxx}); " +
             "var isFound = false; " +
@@ -768,13 +766,8 @@ public class ChartIQView: UIView {
             "var newParameterParameters = {}; "
     
         parameters.forEach { (parameter) in
-            //NSLog("Study Parameter: %@:%@", parameter.key, parameter.value)
             script += getUpdateStudyParametersScript(parameter: parameter.key, value: parameter.value)
         }
-        
-        //script += "helper.updateStudy({inputs:newInputParameters, outputs:newOutputParameters, parameters: {studyOverBoughtColor: '#ff0000', studyOverBoughtValue: '80', studyOverSoldColor: '#00ff00', studyOverSoldValue: '20'}}); "
-        
-        //script += "webkit.messageHandlers.logHandler.postMessage({\"method\": \"LOG\", \"arguments\": JSON.stringify(newParameterParameters)});"
         
         script += "helper.updateStudy({inputs:newInputParameters, outputs:newOutputParameters, parameters: newParameterParameters}); "
         
@@ -1040,22 +1033,6 @@ public class ChartIQView: UIView {
             "       newParameterParameters[\"\(parameter)\"] = \"\(value)\"; " +
             "   } " +
             "} " +
-//            "   for (x in helper.parameters) { " +
-//            "       var parameter = helper.parameters[x]; " +
-//            "webkit.messageHandlers.logHandler.postMessage({\"method\": \"LOG\", \"arguments\": JSON.parse(JSON.stringify({name: parameter[\"name\"]}))});" +
-//            "       if (parameter[\"name\"] === \"\(parameter)\") { " +
-////            "webkit.messageHandlers.logHandler.postMessage({\"method\": \"LOG\", \"arguments\": JSON.parse(JSON.stringify({name: \"Looking for studyOverBought\"}))});" +
-////            "           if ( parameter[\"name\"] === \"studyOverBought\" || parameter[\"name\"] === \"studyOverSold\" ) {" +
-////            "webkit.messageHandlers.logHandler.postMessage({\"method\": \"LOG\", \"arguments\": JSON.parse(JSON.stringify({type: parameter[\"type\"]}))});" +
-////            "               newParameterParameters[\"\(parameter)Color\"] = \"\(value)\"; " +
-////           // "               newParameterParameters[\"\(parameter)\"Color] = \"\(color)\"; " +
-////            "           if (parameter[\"type\"] === \"checkbox\") { " +
-////            "               newParameterParameters[\"\(parameter)\"] = \(value == "false" ? false : true); " +
-//            "           } else {" +
-//            "               newParameterParameters[\"\(parameter)\"] = \"\(value)\"; " +
-// //           "           }" +
-//            "       } " +
-//            "   } " +
             "isFound = false;"
         return updateParametersScript
     }
