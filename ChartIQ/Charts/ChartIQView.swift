@@ -130,21 +130,40 @@ public enum ChartIQStudyError: Error {
 /// Chart drawing tool
 @objc
 public enum ChartIQDrawingTool: Int {
+    case annotation
+    case callout
+    case average
     case channel
     case continuousLine
+    case crossline
     case doodle
     case ellipse
+    case fibretrace
+    case fibprojection
     case fibarc
     case fibfan
-    case fibretrace
     case fibtimezone
+    case gannfan
     case gartley
     case horizontalLine
     case line
     case pitchfork
+    case quadrant
     case ray
     case rectangle
+    case regression
     case segment
+    case arrow
+    case check
+    case cross
+    case focus
+    case heart
+    case star
+    case speedarc
+    case speedline
+    case timecycle
+    case tirone
+    case trendline
     case verticalLine
 }
 
@@ -1169,21 +1188,40 @@ public class ChartIQView: UIView {
     /// Gets draw tool name
     internal func getDrawToolName(for tool: ChartIQDrawingTool) -> String {
         switch tool {
+        case .annotation: return "annotation"
+        case .callout: return "callout"
+        case .average: return "average"
         case .channel: return "channel"
         case .continuousLine: return "continuous"
+        case .crossline: return "crossline"
         case .doodle: return "freeform"
         case .ellipse: return "ellipse"
+        case .fibretrace: return "retracement"
+        case .fibprojection: return "fibprojection"
         case .fibarc: return "fibarc"
         case .fibfan: return "fibfan"
-        case .fibretrace: return "fibonacci"
         case .fibtimezone: return "fibtimezone"
+        case .gannfan: return "gannfan"
         case .gartley: return "gartley"
         case .horizontalLine: return "horizontal"
         case .line: return "line"
         case .pitchfork: return "pitchfork"
+        case .quadrant: return "quadrant"
         case .ray: return "ray"
         case .rectangle: return "rectangle"
+        case .regression: return "regression"
         case .segment: return "segment"
+        case .arrow: return "arrow"
+        case .check: return "check"
+        case .cross: return "xcross"
+        case .focus: return "focusarrow"
+        case .heart: return "heart"
+        case .star: return "star"
+        case .speedarc: return "speedarc"
+        case .speedline: return "speedline"
+        case .timecycle: return "timecycle"
+        case .tirone: return "tirone"
+        case .trendline: return "trendline"
         case .verticalLine: return "vertical"
         }
     }
