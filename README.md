@@ -4,7 +4,7 @@ Native iOS SDK for the [ChartIQ JavaScript library](https://documentation.charti
 
 This SDK has been designed to support a [basic application](https://github.com/ChartIQ/Charting-Library---iOS-Sample-App-Legacy) and may need to be extended to support more elaborate implementations, which can be done by adding code to invoke JavaScript functions directly.
 
-See the [Starting on Mobile: iOS - Legacy](https://documentation.chartiq.com/tutorial-Starting%20on%20iOS%20-%20Legacy.html) tutorial for instruction on using this SDK.
+See the [Getting Started on Mobile: iOS - Legacy](https://documentation.chartiq.com/tutorial-Starting%20on%20iOS%20-%20Legacy.html) tutorial for instruction on using this SDK.
 
 **End of support**
 
