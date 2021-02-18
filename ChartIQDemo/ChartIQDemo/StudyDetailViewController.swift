@@ -166,7 +166,12 @@ class StudyDetailViewController: UITableViewController {
         }
         var parameters = [String: Any]()
         for parameter in paramParameter {
-            parameters[parameter["name"] as! String] = parameter["value"]!
+            if( parameter["name"] as! String == "studyOverBought" || parameter["name"] as! String == "studyOverSold" ){
+                parameters[(parameter["name"] as! String)+"Color"] = parameter["color"]!
+                parameters[(parameter["name"] as! String)+"Value"] = parameter["value"]!
+            }else if( parameter["value"] != nil ){
+                parameters[parameter["name"] as! String] = parameter["value"]!
+            }
         }
         study.inputs = inputs
         study.outputs = outputs
